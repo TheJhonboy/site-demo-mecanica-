@@ -80,10 +80,14 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
 
 /* ---------- Scroll progress + reveal animations ---------- */
 .scroll-progress{
-  position:fixed; top:0; left:0; height:3px; width:0%;
+  position:fixed; top:0; left:0; height:3px; width:100%;
   background: linear-gradient(90deg, var(--primary), var(--primary-light));
   z-index:300;
-  transition: width .08s linear;
+  /* scaleX instead of width: transform is composited, width would force a
+     layout pass on every single scroll event. */
+  transform: scaleX(0);
+  transform-origin:left center;
+  will-change: transform;
 }
 
 .reveal-in{
@@ -187,6 +191,11 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
   transition: box-shadow .2s ease;
 }
 .header.is-scrolled{ box-shadow: var(--shadow); }
+/* Blurring a sticky bar over full-bleed scrolling photos costs real frames on
+   phones — go solid there and keep the glass look on desktop. */
+@media (max-width: 760px){
+  .header{ background: var(--bg); backdrop-filter:none; }
+}
 .header__inner{
   display:flex; align-items:center; justify-content:space-between;
   height: var(--header-h);
@@ -429,26 +438,46 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
 .service-card__link:hover{ text-decoration:underline; }
 
 /* ---------- Process ---------- */
-/* ---------- Scroll motion gallery ---------- */
-.scrollshow{ position:relative; background: var(--dark-ink); }
-.scrollshow__track{ position:relative; height: 400vh; }
+/* ---------- Scroll motion gallery (scroll-scrubbed, GPU-only) ----------
+   Every animated property here is transform/opacity so the whole scrub runs
+   on the compositor. No transitions on the frames: their opacity/scale are
+   driven per animation frame by js/script.js, which keeps the motion locked
+   1:1 to the finger/wheel instead of chasing it. */
+.scrollshow{ position:relative; background:#000; }
+.scrollshow__track{
+  position:relative;
+  /* Scrub distance: ~38vh of scrolling per frame. */
+  height: calc(var(--frames, 10) * 38vh);
+}
 .scrollshow__pin{
   position:sticky; top:0;
   height:100vh;
+  height:100svh;
   overflow:hidden;
 }
-.scrollshow__frames{ position:relative; width:100%; height:100%; }
+.scrollshow__frames{
+  position:relative; width:100%; height:100%;
+  background:#000;
+}
 .scrollshow__img{
   position:absolute; inset:0;
   width:100%; height:100%;
   object-fit:cover;
   opacity:0;
-  transition: opacity .6s ease;
+  visibility:hidden;
+  transform: scale(1.06);
+  transform-origin:center;
+  backface-visibility:hidden;
+  /* Only the two frames in play are promoted (js toggles .is-live), so we
+     never hold 10 full-screen layers in GPU memory on a phone. */
 }
-.scrollshow__img.is-active{ opacity:1; }
+.scrollshow__img.is-live{
+  visibility:visible;
+  will-change: transform, opacity;
+}
 .scrollshow__overlay{
   position:absolute; inset:0; z-index:1;
-  background: linear-gradient(180deg, rgba(10,11,13,.1) 0%, rgba(10,11,13,.25) 55%, rgba(10,11,13,.92) 100%);
+  background: linear-gradient(180deg, rgba(10,11,13,.1) 0%, rgba(10,11,13,.3) 55%, rgba(10,11,13,.93) 100%);
   pointer-events:none;
 }
 .scrollshow__caption{
@@ -456,6 +485,7 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
   left:6%; right:6%; bottom:14%;
   max-width:560px;
   color:#fff;
+  will-change: transform, opacity;
 }
 .scrollshow__count{
   display:inline-block;
@@ -473,7 +503,10 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
   background: rgba(255,255,255,.15);
 }
 .scrollshow__progress span{
-  display:block; height:100%; width:0%;
+  display:block; height:100%; width:100%;
+  transform: scaleX(0);
+  transform-origin:left center;
+  will-change: transform;
   background: linear-gradient(90deg, var(--primary), var(--primary-light));
 }
 .scrollshow__hint{
@@ -488,9 +521,17 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
 .scrollshow__hint.is-hidden{ opacity:0; }
 
 @media (max-width: 760px){
-  .scrollshow__track{ height:300vh; }
+  .scrollshow__track{ height: calc(var(--frames, 10) * 30vh); }
   .scrollshow__caption{ left:20px; right:20px; bottom:15%; }
   .scrollshow__hint{ display:none; }
+}
+
+/* Scrubbing is pointless without motion — show a single clean frame instead. */
+@media (prefers-reduced-motion: reduce){
+  .scrollshow__track{ height:auto; }
+  .scrollshow__pin{ position:relative; height:70vh; }
+  .scrollshow__img{ transform:none !important; }
+  .scrollshow__progress{ display:none; }
 }
 
 .process{ background: var(--dark-ink); padding: 80px 0; }

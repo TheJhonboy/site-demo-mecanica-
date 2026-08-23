@@ -29,12 +29,48 @@ Em `index.html`:
 - Depoimentos, marcas e demais textos são exemplos genéricos — ajuste conforme a oficina real.
 - O JSON-LD (dados estruturados) no `<head>` usa os mesmos dados fictícios — atualize junto.
 
-## Fotos (pendente)
-O site já está com `<img>` apontando para `assets/img/` (hero, os 10 serviços e a galeria de scroll) e com um fallback em CSS/JS que esconde a imagem quebrada e mantém um fundo em gradiente enquanto os arquivos não existem. Para adicionar fotos reais, salve os arquivos com estes nomes exatos em `assets/img/`:
+## Fotos — os arquivos atuais são PLACEHOLDERS
+As 11 imagens em `assets/img/` **não são fotos reais**: são placeholders gerados
+localmente (fundo escuro + ícone + nome do serviço + o selo "IMAGEM DEMO"). Existem
+só para o layout e a animação ficarem apresentáveis e testáveis.
 
-`hero-oficina.jpg`, `servico-motor.jpg`, `servico-pneus.jpg`, `servico-revisao.jpg`, `servico-freios.jpg`, `servico-suspensao.jpg`, `servico-eletrica.jpg`, `servico-bateria.jpg`, `servico-arcondicionado.jpg`, `servico-estofamento.jpg`, `servico-diagnostico.jpg`
+Para usar fotos de verdade, basta sobrescrever os arquivos mantendo os mesmos nomes:
 
-Recomendado: fotos horizontais, ~1200px de largura, licença de uso livre para fins comerciais (ex: Unsplash License / Pexels License).
+`hero-oficina.jpg`, `servico-motor.jpg`, `servico-pneus.jpg`, `servico-revisao.jpg`,
+`servico-freios.jpg`, `servico-suspensao.jpg`, `servico-eletrica.jpg`,
+`servico-bateria.jpg`, `servico-arcondicionado.jpg`, `servico-estofamento.jpg`,
+`servico-diagnostico.jpg`
+
+Recomendado: horizontais, ~1600px de largura, licença livre para uso comercial
+(Unsplash License / Pexels License) ou fotos da própria oficina. Nenhuma alteração
+de código é necessária.
+
+## A animação de scroll (scroll motion)
+A seção `#scrollshow` é um scrub controlado pelo scroll: as fotos são as frames e o
+dedo/roda controla a posição, como arrastar a linha do tempo de um vídeo.
+
+O que mantém isso em 60fps (medido também com CPU 6x mais lenta, em 390x844 @DPR3):
+- o listener de scroll só grava um número; todo o desenho acontece dentro de um único
+  `requestAnimationFrame`;
+- só `transform` e `opacity` são animados — as duas propriedades que o browser resolve
+  no compositor, sem layout nem repaint;
+- geometria (`getBoundingClientRect`) é medida uma vez e cacheada; ler layout dentro do
+  loop causaria reflow forçado a cada frame;
+- apenas as 2 frames em transição ficam visíveis e promovidas a camada; as outras saem
+  com `visibility:hidden` para não ocupar memória de GPU no celular;
+- as imagens são decodificadas antes da seção entrar em tela;
+- o loop dorme quando a seção sai de vista ou quando o movimento assenta;
+- `prefers-reduced-motion` desliga o scrub e mostra uma frame estática.
+
+**Para virar um vídeo de verdade** (movimento contínuo em vez de 10 fotos), exporte o
+vídeo como sequência de frames JPEG (~60–120 arquivos) e troque a lista de `<img>` dentro
+de `.scrollshow__frames`. A engine não muda: ela já interpola entre frames adjacentes, e
+quanto mais frames, mais o resultado vira vídeo. Evite `<video>` + `currentTime` no scroll
+— buscar no vídeo é assíncrono e engasga no iOS; sequência de frames é a técnica que
+sites como o da Apple usam justamente por isso.
+
+A velocidade do scrub é controlada por `--frames` e pela altura de `.scrollshow__track`
+no CSS (hoje ~38vh de rolagem por frame no desktop, 30vh no mobile).
 
 ## Deploy na Vercel
 Site 100% estático — a Vercel detecta e publica sem nenhuma configuração adicional (sem `vercel.json`, sem build step).
