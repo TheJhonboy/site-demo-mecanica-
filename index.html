@@ -3,23 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TorqueMax Mecânica Automotiva | Oficina Mecânica em São Paulo</title>
+<title>Klaus Auto Mecânica | Oficina Mecânica em São Paulo</title>
 <meta name="description" content="Oficina mecânica para todas as marcas: motor, freios, suspensão, elétrica, ar-condicionado, pneus e revisão completa. Orçamento grátis pelo WhatsApp.">
 
 <!-- Open Graph -->
-<meta property="og:title" content="TorqueMax Mecânica Automotiva">
+<meta property="og:title" content="Klaus Auto Mecânica">
 <meta property="og:description" content="Manutenção e reparo automotivo para todas as marcas. Orçamento rápido pelo WhatsApp.">
 <meta property="og:type" content="website">
 
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<meta name="theme-color" content="#0d0e11">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRepair",
+  "name": "Klaus Auto Mecânica",
+  "image": "assets/img/hero-oficina.jpg",
+  "telephone": "+5511900000000",
+  "email": "contato@klaus.com.br",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Av. das Nações, 1450",
+    "addressLocality": "São Paulo",
+    "addressRegion": "SP",
+    "postalCode": "04578-000",
+    "addressCountry": "BR"
+  },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "13:00" }
+  ]
+}
+</script>
 </head>
 <body>
 
 <a href="#conteudo" class="skip-link">Pular para o conteúdo</a>
+
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 <!-- ===== TOPBAR ===== -->
 <div class="topbar">
@@ -40,7 +66,7 @@
 <!-- ===== HEADER ===== -->
 <header class="header" id="header">
   <div class="container header__inner">
-    <a href="#top" class="logo">Torque<span>Max</span></a>
+    <a href="#top" class="logo">Klaus<span>.</span></a>
 
     <nav class="nav" id="nav">
       <a href="#servicos" class="nav__link">Serviços</a>
@@ -48,7 +74,7 @@
       <a href="#horarios" class="nav__link">Horários</a>
       <a href="#localizacao" class="nav__link">Localização</a>
       <a href="#faq" class="nav__link">Dúvidas</a>
-      <a href="#" class="btn btn--whatsapp btn--nav" data-wa data-msg="Olá! Gostaria de falar com a TorqueMax.">
+      <a href="#" class="btn btn--whatsapp btn--nav" data-wa data-msg="Olá! Gostaria de falar com a oficina Klaus.">
         <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="5" stroke="currentColor" stroke-width="1.8"/><polygon points="6,18 6,22 10,18" fill="currentColor"/><circle cx="9" cy="11.5" r="1.3" fill="currentColor"/><circle cx="12" cy="11.5" r="1.3" fill="currentColor"/><circle cx="15" cy="11.5" r="1.3" fill="currentColor"/></svg>
         WhatsApp
       </a>
@@ -64,14 +90,16 @@
 
   <!-- ===== HERO ===== -->
   <section class="hero" id="top">
-    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__bg" aria-hidden="true">
+      <img class="hero__photo" src="assets/img/hero-oficina.jpg" alt="" loading="eager">
+    </div>
     <div class="container hero__inner">
       <div class="hero__content">
-        <span class="badge">★★★★★ <strong>4.9</strong> de avaliação dos clientes</span>
-        <h1>Seu carro em boas mãos, <span>sem enrolação</span>.</h1>
-        <p>Manutenção e reparo para todas as marcas — Honda, Chevrolet, Volkswagen, Fiat, Hyundai e muitas outras. Diagnóstico honesto, orçamento antes de qualquer serviço e prazo combinado de verdade.</p>
+        <span class="badge reveal-in" style="--delay:0s">★★★★★ <strong>4.9</strong> de avaliação dos clientes</span>
+        <h1 class="reveal-in" style="--delay:.08s">Seu carro em boas mãos, <span>sem enrolação</span>.</h1>
+        <p class="reveal-in" style="--delay:.16s">Manutenção e reparo para todas as marcas — Honda, Chevrolet, Volkswagen, Fiat, Hyundai e muitas outras. Diagnóstico honesto, orçamento antes de qualquer serviço e prazo combinado de verdade.</p>
 
-        <div class="hero__cta">
+        <div class="hero__cta reveal-in" style="--delay:.24s">
           <a href="#" class="btn btn--whatsapp btn--lg" data-wa data-msg="Olá! Quero fazer um orçamento para o meu carro.">
             <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="5" stroke="currentColor" stroke-width="1.8"/><polygon points="6,18 6,22 10,18" fill="currentColor"/><circle cx="9" cy="11.5" r="1.3" fill="currentColor"/><circle cx="12" cy="11.5" r="1.3" fill="currentColor"/><circle cx="15" cy="11.5" r="1.3" fill="currentColor"/></svg>
             Peça seu orçamento no WhatsApp
@@ -79,20 +107,23 @@
           <a href="#servicos" class="btn btn--outline btn--lg">Ver todos os serviços</a>
         </div>
 
-        <ul class="hero__trust">
+        <ul class="hero__trust reveal-in" style="--delay:.32s">
           <li><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none"><polyline points="4,12 9,17 20,6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Orçamento grátis</li>
           <li><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none"><polyline points="4,12 9,17 20,6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Garantia em todos os serviços</li>
           <li><svg class="icon icon--sm" viewBox="0 0 24 24" fill="none"><polyline points="4,12 9,17 20,6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> +12 anos de oficina</li>
         </ul>
       </div>
 
-      <div class="hero__stats">
-        <div class="stat-card"><strong>12+</strong><span>anos de experiência</span></div>
-        <div class="stat-card"><strong>8.000+</strong><span>carros atendidos</span></div>
-        <div class="stat-card"><strong>4.9</strong><span>avaliação média</span></div>
-        <div class="stat-card"><strong>48h</strong><span>prazo médio de entrega</span></div>
+      <div class="hero__stats reveal-in" style="--delay:.4s">
+        <div class="stat-card"><strong data-count="12" data-suffix="+">0</strong><span>anos de experiência</span></div>
+        <div class="stat-card"><strong data-count="8000" data-suffix="+">0</strong><span>carros atendidos</span></div>
+        <div class="stat-card"><strong data-count="4.9" data-decimals="1">0</strong><span>avaliação média</span></div>
+        <div class="stat-card"><strong data-count="48" data-suffix="h">0</strong><span>prazo médio de entrega</span></div>
       </div>
     </div>
+    <a href="#servicos" class="hero__scrollcue" aria-label="Rolar para ver mais">
+      <svg viewBox="0 0 24 24" fill="none"><polyline points="6,9 12,15 18,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
   </section>
 
   <!-- ===== MARQUEE DE MARCAS ===== -->
@@ -115,104 +146,188 @@
       <div class="services__grid">
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
-              <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
-                <line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
-                <line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/>
-                <line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/>
-              </g>
-            </svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-motor.jpg" alt="Mecânico realizando manutenção em motor de carro" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
+                <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
+                  <line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
+                  <line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/>
+                  <line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/>
+                </g>
+              </svg>
+            </div>
           </div>
-          <h3>Motor e Mecânica Geral</h3>
-          <p>Diagnóstico, reparo e manutenção de motor com peças de qualidade e mão de obra especializada.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Gostaria de agendar uma avaliação para o motor do meu carro.">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Motor e Mecânica Geral</h3>
+            <p>Diagnóstico, reparo e manutenção de motor com peças de qualidade e mão de obra especializada.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Gostaria de agendar uma avaliação para o motor do meu carro.">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="9" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="15" x2="12" y2="21" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1.8"/><line x1="15" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-pneus.jpg" alt="Troca de pneu em oficina mecânica" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="9" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="15" x2="12" y2="21" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1.8"/><line x1="15" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
           </div>
-          <h3>Pneus e Alinhamento</h3>
-          <p>Troca de pneus, balanceamento, alinhamento e geometria para uma direção segura e estável.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Preciso trocar/alinhar os pneus do meu carro. Podem me passar um orçamento?">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Pneus e Alinhamento</h3>
+            <p>Troca de pneus, balanceamento, alinhamento e geometria para uma direção segura e estável.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Preciso trocar/alinhar os pneus do meu carro. Podem me passar um orçamento?">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="2" width="6" height="3" rx="1" fill="currentColor"/><polyline points="8,13 11,16 16,9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-revisao.jpg" alt="Mecânico fazendo revisão e inspeção completa do carro" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="2" width="6" height="3" rx="1" fill="currentColor"/><polyline points="8,13 11,16 16,9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
           </div>
-          <h3>Revisão Completa</h3>
-          <p>Checklist detalhado seguindo o manual do fabricante, com relatório do que foi verificado.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Quero agendar uma revisão completa para o meu carro.">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Revisão Completa</h3>
+            <p>Checklist detalhado seguindo o manual do fabricante, com relatório do que foi verificado.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Quero agendar uma revisão completa para o meu carro.">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/>
-              <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="6.5"/><line x1="12" y1="17.5" x2="12" y2="20"/><line x1="4" y1="12" x2="6.5" y2="12"/><line x1="17.5" y1="12" x2="20" y2="12"/><line x1="6.3" y1="6.3" x2="8" y2="8"/><line x1="16" y1="16" x2="17.7" y2="17.7"/></g>
-            </svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-freios.jpg" alt="Disco e pinça de freio de carro em manutenção" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/>
+                <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="6.5"/><line x1="12" y1="17.5" x2="12" y2="20"/><line x1="4" y1="12" x2="6.5" y2="12"/><line x1="17.5" y1="12" x2="20" y2="12"/><line x1="6.3" y1="6.3" x2="8" y2="8"/><line x1="16" y1="16" x2="17.7" y2="17.7"/></g>
+              </svg>
+            </div>
           </div>
-          <h3>Freios</h3>
-          <p>Pastilhas, discos, fluido de freio e sistema ABS revisados para sua segurança.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Meu carro está com um problema nos freios, podem verificar?">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Freios</h3>
+            <p>Pastilhas, discos, fluido de freio e sistema ABS revisados para sua segurança.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Meu carro está com um problema nos freios, podem verificar?">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><polyline points="6,3 10,6 6,9 10,12 6,15 10,18 6,21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="3" x2="16" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-suspensao.jpg" alt="Amortecedores e suspensão de carro em manutenção" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><polyline points="6,3 10,6 6,9 10,12 6,15 10,18 6,21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="3" x2="16" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
           </div>
-          <h3>Suspensão</h3>
-          <p>Amortecedores, molas e buchas para acabar com ruídos, trepidação e "carro balançando".</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Está saindo barulho na suspensão do meu carro, podem avaliar?">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Suspensão</h3>
+            <p>Amortecedores, molas e buchas para acabar com ruídos, trepidação e "carro balançando".</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Está saindo barulho na suspensão do meu carro, podem avaliar?">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><polygon points="13,2 6,14 11,14 9,22 18,10 12,10" fill="currentColor"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-eletrica.jpg" alt="Mecânico testando sistema elétrico do carro" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><polygon points="13,2 6,14 11,14 9,22 18,10 12,10" fill="currentColor"/></svg>
+            </div>
           </div>
-          <h3>Sistema Elétrico</h3>
-          <p>Troca de lâmpadas, fusíveis, chicotes e sensores. Do farol queimado ao painel apagado.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Preciso trocar lâmpadas/fusíveis do meu carro.">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Sistema Elétrico</h3>
+            <p>Troca de lâmpadas, fusíveis, chicotes e sensores. Do farol queimado ao painel apagado.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Preciso trocar lâmpadas/fusíveis do meu carro.">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="5" width="3" height="3" fill="currentColor"/><line x1="8" y1="13.5" x2="16" y2="13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-bateria.jpg" alt="Bateria de carro sendo testada por mecânico" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="5" width="3" height="3" fill="currentColor"/><line x1="8" y1="13.5" x2="16" y2="13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
           </div>
-          <h3>Bateria e Alternador</h3>
-          <p>Teste, troca e verificação de carga do sistema elétrico. Sem susto na hora de ligar o carro.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Acho que a bateria do meu carro está no fim, podem verificar?">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Bateria e Alternador</h3>
+            <p>Teste, troca e verificação de carga do sistema elétrico. Sem susto na hora de ligar o carro.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Acho que a bateria do meu carro está no fim, podem verificar?">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="8" x2="15" y2="8"/><line x1="3" y1="12" x2="19" y2="12"/><line x1="3" y1="16" x2="12" y2="16"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-arcondicionado.jpg" alt="Manutenção do ar-condicionado automotivo" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="8" x2="15" y2="8"/><line x1="3" y1="12" x2="19" y2="12"/><line x1="3" y1="16" x2="12" y2="16"/></svg>
+            </div>
           </div>
-          <h3>Ar-Condicionado</h3>
-          <p>Higienização, recarga de gás e reparo do compressor para o ar gelar como novo.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! O ar-condicionado do meu carro não está gelando, podem dar uma olhada?">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Ar-Condicionado</h3>
+            <p>Higienização, recarga de gás e reparo do compressor para o ar gelar como novo.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! O ar-condicionado do meu carro não está gelando, podem dar uma olhada?">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="12" width="16" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="4" width="6" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-estofamento.jpg" alt="Banco de carro com estofamento em reparo" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="12" width="16" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="4" width="6" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
           </div>
-          <h3>Estofamento e Bancos</h3>
-          <p>Troca e reparo de bancos, forração interna e pequenos reparos no acabamento.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Quero trocar/reformar o banco do meu carro.">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Estofamento e Bancos</h3>
+            <p>Troca e reparo de bancos, forração interna e pequenos reparos no acabamento.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Quero trocar/reformar o banco do meu carro.">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
         <div class="service-card">
-          <div class="service-card__icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><polyline points="6,13 9,8 12,12 15,7 18,10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="20" x2="15" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="16" x2="12" y2="20" stroke="currentColor" stroke-width="1.8"/></svg>
+          <div class="service-card__media">
+            <img src="assets/img/servico-diagnostico.jpg" alt="Scanner automotivo conectado para diagnóstico do carro" loading="lazy">
+            <div class="service-card__icon">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><polyline points="6,13 9,8 12,12 15,7 18,10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="20" x2="15" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="16" x2="12" y2="20" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
           </div>
-          <h3>Diagnóstico e Injeção Eletrônica</h3>
-          <p>Scanner automotivo para identificar a luz acesa no painel e resolver a causa real do problema.</p>
-          <a href="#" class="service-card__link" data-wa data-msg="Olá! Acendeu uma luz no painel do meu carro, será que podem fazer um diagnóstico?">Solicitar no WhatsApp →</a>
+          <div class="service-card__body">
+            <h3>Diagnóstico e Injeção Eletrônica</h3>
+            <p>Scanner automotivo para identificar a luz acesa no painel e resolver a causa real do problema.</p>
+            <a href="#" class="service-card__link" data-wa data-msg="Olá! Acendeu uma luz no painel do meu carro, será que podem fazer um diagnóstico?">Solicitar no WhatsApp →</a>
+          </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GALERIA COM SCROLL (scroll motion) ===== -->
+  <section class="scrollshow" id="scrollshow" aria-label="Nosso trabalho em ação">
+    <div class="scrollshow__track">
+      <div class="scrollshow__pin">
+        <div class="scrollshow__frames">
+          <img class="scrollshow__img is-active" src="assets/img/servico-motor.jpg" alt="Motor e mecânica geral" data-title="Motor e Mecânica Geral" data-text="Diagnóstico e reparo com peças de qualidade." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-pneus.jpg" alt="Pneus e alinhamento" data-title="Pneus e Alinhamento" data-text="Troca, balanceamento e geometria." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-revisao.jpg" alt="Revisão completa" data-title="Revisão Completa" data-text="Checklist detalhado do seu carro." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-freios.jpg" alt="Freios" data-title="Freios" data-text="Pastilhas, discos e sistema ABS." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-suspensao.jpg" alt="Suspensão" data-title="Suspensão" data-text="Amortecedores, molas e buchas." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-eletrica.jpg" alt="Sistema elétrico" data-title="Sistema Elétrico" data-text="Lâmpadas, fusíveis e chicotes." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-bateria.jpg" alt="Bateria e alternador" data-title="Bateria e Alternador" data-text="Teste, troca e verificação de carga." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-arcondicionado.jpg" alt="Ar-condicionado" data-title="Ar-Condicionado" data-text="Higienização e recarga de gás." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-estofamento.jpg" alt="Estofamento e bancos" data-title="Estofamento e Bancos" data-text="Troca e reparo de bancos." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/servico-diagnostico.jpg" alt="Diagnóstico e injeção eletrônica" data-title="Diagnóstico e Injeção" data-text="Scanner automotivo completo." loading="lazy">
+
+          <div class="scrollshow__overlay"></div>
+
+          <div class="scrollshow__caption">
+            <span class="scrollshow__count"><span id="scrollshowIndex">1</span> / 10</span>
+            <h3 id="scrollshowTitle">Motor e Mecânica Geral</h3>
+            <p id="scrollshowText">Diagnóstico e reparo com peças de qualidade.</p>
+          </div>
+
+          <div class="scrollshow__progress"><span id="scrollshowBar"></span></div>
+          <div class="scrollshow__hint">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M12 19l5-5M12 19l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            role para ver os serviços
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -362,7 +477,7 @@
         </details>
         <details class="faq-item">
           <summary>Os serviços têm garantia?<svg class="icon chevron" viewBox="0 0 24 24" fill="none"><polyline points="6,9 12,15 18,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-          <p>Sim, todo serviço realizado na TorqueMax sai com garantia. Qualquer dúvida depois, é só chamar a gente.</p>
+          <p>Sim, todo serviço realizado na oficina Klaus sai com garantia. Qualquer dúvida depois, é só chamar a gente.</p>
         </details>
         <details class="faq-item">
           <summary>Quais as formas de pagamento?<svg class="icon chevron" viewBox="0 0 24 24" fill="none"><polyline points="6,9 12,15 18,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
@@ -393,7 +508,7 @@
         </div>
         <div class="location__item">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,7 12,13 21,7"/></svg>
-          <div><strong>Contato</strong><p>(11) 90000-0000<br>contato@torquemax.com.br</p></div>
+          <div><strong>Contato</strong><p>(11) 90000-0000<br>contato@klaus.com.br</p></div>
         </div>
 
         <div class="location__actions">
@@ -403,7 +518,7 @@
           </a>
           <a href="#" id="instagramLink" class="btn btn--outline" target="_blank" rel="noopener noreferrer">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
-            @torquemax.oficina
+            @klaus.oficina
           </a>
         </div>
       </div>
@@ -412,7 +527,7 @@
         <!-- DEMO: endereço fictício. Depois de criar o local no Google Maps,
              troque este src pelo link "Incorporar mapa" gerado no Google Maps. -->
         <iframe
-          title="Mapa da oficina TorqueMax"
+          title="Mapa da oficina Klaus"
           src="https://www.google.com/maps?q=Av.+das+Na%C3%A7%C3%B5es,+1450,+S%C3%A3o+Paulo,+SP&output=embed"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade">
@@ -426,20 +541,20 @@
     <div class="container instagram__inner">
       <div class="instagram__text">
         <span class="eyebrow eyebrow--light">Bastidores da oficina</span>
-        <h2>Siga a TorqueMax no Instagram</h2>
+        <h2>Siga a oficina Klaus no Instagram</h2>
         <p>Antes e depois dos carros, dicas rápidas de manutenção e novidades da oficina.</p>
         <a href="#" id="instagramLink2" class="btn btn--light" target="_blank" rel="noopener noreferrer">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
-          Seguir @torquemax.oficina
+          Seguir @klaus.oficina
         </a>
       </div>
       <div class="instagram__grid" aria-hidden="true">
-        <div class="ig-tile"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg></div>
-        <div class="ig-tile"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><polyline points="8,13 11,16 16,9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="ig-tile"><svg viewBox="0 0 24 24" fill="none"><polygon points="13,2 6,14 11,14 9,22 18,10 12,10" fill="currentColor"/></svg></div>
-        <div class="ig-tile"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></div>
-        <div class="ig-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="8" x2="15" y2="8"/><line x1="3" y1="12" x2="19" y2="12"/><line x1="3" y1="16" x2="12" y2="16"/></svg></div>
-        <div class="ig-tile"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="12" width="16" height="6" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="6" y="4" width="6" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <div class="ig-tile"><img src="assets/img/servico-motor.jpg" alt="" loading="lazy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/></svg></div>
+        <div class="ig-tile"><img src="assets/img/servico-pneus.jpg" alt="" loading="lazy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/></svg></div>
+        <div class="ig-tile"><img src="assets/img/servico-freios.jpg" alt="" loading="lazy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/></svg></div>
+        <div class="ig-tile"><img src="assets/img/servico-eletrica.jpg" alt="" loading="lazy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/></svg></div>
+        <div class="ig-tile"><img src="assets/img/servico-arcondicionado.jpg" alt="" loading="lazy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/></svg></div>
+        <div class="ig-tile"><img src="assets/img/servico-estofamento.jpg" alt="" loading="lazy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/></svg></div>
       </div>
     </div>
   </section>
@@ -449,7 +564,7 @@
     <div class="container final-cta__inner">
       <h2>Seu carro precisa de atenção agora?</h2>
       <p>Fale com a nossa equipe e receba um orçamento sem compromisso, direto no seu WhatsApp.</p>
-      <a href="#" class="btn btn--whatsapp btn--lg" data-wa data-msg="Olá! Vim pelo site da TorqueMax e quero falar com a oficina.">
+      <a href="#" class="btn btn--whatsapp btn--lg" data-wa data-msg="Olá! Vim pelo site da oficina Klaus e quero falar com a oficina.">
         <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="5" stroke="currentColor" stroke-width="1.8"/><polygon points="6,18 6,22 10,18" fill="currentColor"/><circle cx="9" cy="11.5" r="1.3" fill="currentColor"/><circle cx="12" cy="11.5" r="1.3" fill="currentColor"/><circle cx="15" cy="11.5" r="1.3" fill="currentColor"/></svg>
         Chamar no WhatsApp agora
       </a>
@@ -462,10 +577,10 @@
 <footer class="footer">
   <div class="container footer__grid">
     <div class="footer__col footer__col--brand">
-      <a href="#top" class="logo">Torque<span>Max</span></a>
+      <a href="#top" class="logo">Klaus<span>.</span></a>
       <p>Oficina mecânica para todas as marcas. Diagnóstico honesto, orçamento antes do serviço e garantia real.</p>
       <div class="footer__social">
-        <a href="#" data-wa data-msg="Olá! Vim pelo site da TorqueMax." aria-label="WhatsApp">
+        <a href="#" data-wa data-msg="Olá! Vim pelo site da oficina Klaus." aria-label="WhatsApp">
           <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="5" stroke="currentColor" stroke-width="1.8"/><polygon points="6,18 6,22 10,18" fill="currentColor"/><circle cx="9" cy="11.5" r="1.3" fill="currentColor"/><circle cx="12" cy="11.5" r="1.3" fill="currentColor"/><circle cx="15" cy="11.5" r="1.3" fill="currentColor"/></svg>
         </a>
         <a href="#" id="instagramLink3" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -496,13 +611,13 @@
     <div class="footer__col">
       <h4>Contato</h4>
       <p>Av. das Nações, 1450<br>São Paulo/SP — CEP 04578-000</p>
-      <p>(11) 90000-0000<br>contato@torquemax.com.br</p>
+      <p>(11) 90000-0000<br>contato@klaus.com.br</p>
     </div>
   </div>
 
   <div class="footer__bottom">
     <div class="container footer__bottom-inner">
-      <span>© <span id="year"></span> TorqueMax Mecânica Automotiva. Todos os direitos reservados.</span>
+      <span>© <span id="year"></span> Klaus Auto Mecânica. Todos os direitos reservados.</span>
       <span class="footer__demo-note">Site demonstrativo — dados fictícios para fins de apresentação.</span>
     </div>
   </div>
