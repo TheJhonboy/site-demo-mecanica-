@@ -45,7 +45,44 @@ Recomendado: horizontais, ~1600px de largura, licença livre para uso comercial
 (Unsplash License / Pexels License) ou fotos da própria oficina. Nenhuma alteração
 de código é necessária.
 
-## A animação de scroll (scroll motion)
+## O vídeo da primeira tela (scroll motion)
+A primeira coisa que o visitante vê é o vídeo da oficina em tela cheia, e a rolagem passa o
+vídeo quadro a quadro. Os 120 quadros ficam em `assets/video/frames/` e são desenhados num
+`<canvas>`; o vídeo original está em `assets/video/oficina.mp4`.
+
+### Como os quadros foram gerados
+```
+ffmpeg -i assets/video/oficina.mp4 \
+  -vf "fps=7.286,unsharp=5:5:0.35" -q:v 6 \
+  assets/video/frames/f-%03d.jpg
+```
+`fps` = nº de quadros ÷ duração do vídeo (120 ÷ 16,47s). Para trocar o vídeo: substitua o mp4,
+rode o comando ajustando o `fps`, e atualize `VHERO_FRAMES` em `js/script.js`.
+
+### Por que não é 2K nem 60fps
+O material original é **720×1280 a 30fps**. Ampliar para 2K não cria detalhe que não existe —
+só deixa mais pesado e mais mole. E num scrub o "fps" não vem do arquivo: quem manda é a taxa
+de atualização da tela (o `requestAnimationFrame`), então 120 quadros já rodam a 60fps.
+
+Testei 1080p com upscale antes de decidir: decodificar um quadro custava 26ms em WebP 1080 e
+custa 6ms em JPEG 720 nativo, contra um orçamento de 16,7ms por frame a 60fps. Ou seja, o
+upscale pagava caro sem entregar nitidez.
+
+### Medições (Playwright/Chromium, rolagem contínua)
+| cenário | FPS |
+|---|---|
+| Desktop 1440×900 | 59,9 |
+| Mobile 390×844 @DPR3 | 59,9 |
+| Mobile + CPU 4× e 6× mais lenta | 59,9 (com quadros pulados) |
+
+Carga até revelar: ~4,6s em 4G bom, ~13s em 4G fraco (6MB no total).
+
+### Tela de carregamento
+`#loader` mostra o progresso **real** do download dos quadros (não um timer falso) e trava a
+rolagem até terminar. Se algum arquivo falhar ou demorar, um timeout de 8s revela o site mesmo
+assim — ninguém pode ficar preso na tela de carregamento por causa de um arquivo.
+
+## A galeria de fotos com scroll (mais abaixo na página)
 A seção `#scrollshow` é um scrub controlado pelo scroll: as fotos são as frames e o
 dedo/roda controla a posição, como arrastar a linha do tempo de um vídeo.
 

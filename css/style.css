@@ -19,6 +19,9 @@
   --whatsapp: #25d366;
   --whatsapp-dark: #1ebd5a;
 
+  /* Vermelho da barra de carregamento — casa com as pinças de freio do vídeo. */
+  --loader-red: #e02516;
+
   --light-bg: #f7f7f9;
   --light-surface: #ffffff;
   --light-border: #e7e8ec;
@@ -77,6 +80,51 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
 
 .icon{ width:20px; height:20px; flex-shrink:0; }
 .icon--sm{ width:16px; height:16px; }
+
+/* ---------- Tela de carregamento ----------
+   O site pesa ~8,5MB de quadros na primeira carga; em vez da tela branca do
+   navegador, seguramos o scroll e mostramos o progresso real do download. */
+.loader{
+  position:fixed; inset:0; z-index:1000;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg);
+  opacity:1;
+  transition: opacity .5s ease;
+}
+.loader.is-done{ opacity:0; pointer-events:none; }
+.loader__inner{
+  display:flex; flex-direction:column; align-items:center; gap:20px;
+  padding:0 32px;
+  width:min(360px, 82vw);
+}
+.loader__logo{
+  font-family:'Poppins', sans-serif;
+  font-weight:800; font-size:2rem; color:#fff; letter-spacing:-.02em;
+}
+.loader__logo span{ color: var(--loader-red); }
+.loader__bar{
+  width:100%; height:4px;
+  border-radius:999px;
+  background: rgba(255,255,255,.12);
+  overflow:hidden;
+}
+.loader__bar span{
+  display:block; width:100%; height:100%;
+  border-radius:999px;
+  background: linear-gradient(90deg, var(--loader-red), #ff5a3c);
+  transform: scaleX(0);
+  transform-origin:left center;
+  will-change: transform;
+}
+.loader__pct{
+  font-size:.8rem; font-weight:600; letter-spacing:.08em;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+body.is-loading{ overflow:hidden; }
+/* O conteúdo só aparece depois — evita ver o site meio montado por trás. */
+body.is-loading main, body.is-loading .footer,
+body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
 
 /* ---------- Scroll progress + reveal animations ---------- */
 .scroll-progress{
@@ -438,6 +486,95 @@ section[id]{ scroll-margin-top: calc(var(--header-h) + 46px); }
 .service-card__link:hover{ text-decoration:underline; }
 
 /* ---------- Process ---------- */
+/* ---------- Vídeo scroll-scrub (primeira tela) ----------
+   Mesmo princípio da galeria abaixo, mas desenhando num <canvas>: são 180
+   quadros, e 180 <img> em tela cheia no DOM seria peso morto. */
+.vhero{ position:relative; background:#000; }
+.vhero__track{ position:relative; height: 450vh; }
+.vhero__pin{
+  position:sticky; top:0;
+  height:100vh;
+  height:100svh;
+  overflow:hidden;
+  background:#000;
+}
+.vhero__canvas{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block;
+  /* Sem isso o canvas é re-rasterizado junto com o scroll do bloco sticky e o
+     scrub cai de 60 para 30fps (medido). Promovê-lo a camada própria deixa a
+     rolagem por conta do compositor. */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.vhero__overlay{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg, rgba(8,9,11,.72) 0%, rgba(8,9,11,.28) 32%, rgba(8,9,11,.42) 62%, rgba(8,9,11,.92) 100%);
+  pointer-events:none;
+}
+.vhero__content{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:36px;
+  padding: 0 24px;
+  text-align:center;
+}
+.vhero__lines{
+  position:relative;
+  width:min(720px, 92vw);
+  /* Altura fixa: as frases são absolutas e empilhadas, então sem isso o CTA
+     pularia de lugar a cada troca. */
+  height: 4.8em;
+  display:flex; align-items:center; justify-content:center;
+}
+.vhero__line{
+  position:absolute; left:0; right:0; margin:0;
+  font-family:'Poppins', sans-serif;
+  font-size: clamp(1.35rem, 3.6vw, 2.5rem);
+  line-height:1.25;
+  font-weight:600;
+  color: rgba(255,255,255,.82);
+  text-shadow: 0 2px 30px rgba(0,0,0,.7);
+  opacity:0;
+  transform: translate3d(0, 16px, 0);
+  /* Saída rápida, entrada com um respiro depois: sem isso as duas frases ficam
+     legíveis ao mesmo tempo no meio da troca e o texto vira sopa. */
+  transition: opacity .2s ease, transform .2s ease;
+  will-change: transform, opacity;
+}
+.vhero__line strong{ color:#fff; font-weight:800; }
+.vhero__line.is-on{
+  opacity:1;
+  transform: translate3d(0,0,0);
+  transition: opacity .45s ease .18s, transform .45s ease .18s;
+}
+
+.vhero__cta{ position:relative; z-index:1; }
+
+.vhero__cue{
+  position:absolute; left:50%; bottom:20px;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,.6);
+  transition: opacity .4s ease;
+}
+.vhero__cue svg{ display:block; width:24px; height:24px; animation: bob 1.8s ease-in-out infinite; }
+.vhero__cue.is-hidden{ opacity:0; }
+
+@media (max-width: 760px){
+  .vhero__track{ height: 380vh; }
+  .vhero__content{ gap:28px; }
+  .vhero__lines{ height: 5.4em; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .vhero__track{ height:auto; }
+  .vhero__pin{ position:relative; height:86svh; }
+  .vhero__line{ transition:none; }
+}
+
 /* ---------- Scroll motion gallery (scroll-scrubbed, GPU-only) ----------
    Every animated property here is transform/opacity so the whole scrub runs
    on the compositor. No transitions on the frames: their opacity/scale are
