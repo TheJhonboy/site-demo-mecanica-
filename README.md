@@ -9,6 +9,10 @@ Site estático (HTML/CSS/JS puro, sem build) com:
 - Bloco de Instagram e depoimentos;
 - Botão flutuante e vários CTAs de WhatsApp com mensagem pré-preenchida por serviço.
 
+## Histórico do projeto
+Todas as etapas, com data, hora, o que foi pedido e o que mudou, estão em
+[HISTORICO.md](HISTORICO.md).
+
 ## Como visualizar
 Basta abrir `index.html` no navegador, ou servir a pasta com qualquer servidor estático:
 
