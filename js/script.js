@@ -168,401 +168,156 @@ function setupCountUp() {
 }
 
 /* =========================================================
-   Vídeo scroll-scrub (primeira tela)
+   Vídeo de fundo da primeira tela
    ---------------------------------------------------------
-   Os 120 quadros de assets/video/frames/ são desenhados num <canvas>: rolar a
-   página passa o vídeo quadro a quadro.
+   O vídeo roda sozinho em loop, sem depender de rolagem. As frases trocam
+   acompanhando o tempo do vídeo (não um timer solto), então a volta do loop
+   e a volta das frases coincidem.
 
-   Duas diferenças em relação à galeria de fotos mais abaixo:
-   - troca seca de quadro, sem crossfade — quadros de vídeo são quase idênticos
-     entre si e o blend só criaria fantasma;
-   - canvas em vez de 120 <img>, que seriam peso morto no DOM.
-
-   Decisões que vieram de medição, não de palpite:
-   - JPEG 720x1280, não WebP 1080p: decodificar um quadro custava 26ms em WebP
-     1080 e custa 6ms em JPEG 720, contra um orçamento de 16,7ms por frame a
-     60fps. O 1080 era upscale do material original (720p nativo) — pagava
-     decode sem acrescentar detalhe nenhum.
-   - O canvas precisa de `will-change/translateZ` no CSS: sem isso ele é
-     re-rasterizado junto com o scroll do bloco sticky e o scrub cai para 30fps.
-   - Decodes limitados a MAX_INFLIGHT e enfileirados por proximidade: disparar
-     a janela inteira de uma vez satura o decodificador.
-   - frameStep adaptativo: em aparelho fraco, pular quadros mantém a rolagem a
-     60fps. Menos quadros distintos a 60fps é melhor que todos a 12fps.
-
-   Memória: manter os 120 quadros decodificados (720x1280x4 ≈ 3,7MB cada) seriam
-   ~440MB. Por isso guardamos só o dado comprimido (~6MB) e pedimos decode numa
-   janela ao redor do quadro atual. Se o quadro exato ainda não estiver pronto,
-   desenhamos o mais próximo que já está — o main thread nunca bloqueia
-   esperando decode, que é o que derruba o fps.
+   Por que <video> e não uma sequência de quadros num canvas: o navegador
+   decodifica vídeo em hardware, o arquivo é um só (3,5MB contra 6MB de 120
+   JPEGs) e o loop é contínuo de verdade. A sequência de quadros só se paga
+   quando o dedo precisa controlar a posição, que não é mais o caso aqui.
    ========================================================= */
-const VHERO_FRAMES = 120;
-const vheroSrc = (i) => `assets/video/frames/f-${String(i + 1).padStart(3, "0")}.jpg`;
-
-function setupVideoScrub(preloaded) {
+function setupHeroVideo(objectUrl) {
   const section = document.getElementById("vhero");
-  const track = document.getElementById("vheroTrack");
-  const canvas = document.getElementById("vheroCanvas");
-  if (!section || !track || !canvas) return;
+  const video = document.getElementById("vheroVideo");
+  if (!section || !video) return;
 
-  const ctx = canvas.getContext("2d", { alpha: false });
   const lines = Array.from(section.querySelectorAll(".vhero__line"));
-  const cue = section.querySelector(".vhero__cue");
-  const images = preloaded || [];
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let active = 0;
 
-  const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
-  const loaded = (img) => img && img.complete && img.naturalWidth > 0;
-  // "pronto" = decodificado. Desenhar um quadro só carregado força decode
-  // síncrono no main thread, que é exatamente o que come o frame.
-  const ready = (img) => loaded(img) && img.__decoded === true;
-
-  // ---- canvas sizing (DPR limitado a 2: em DPR3 o ganho é invisível e o
-  // custo de fill-rate é real) ----
-  let cw = 0, ch = 0;
-  const resize = () => {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const r = canvas.getBoundingClientRect();
-    cw = Math.round(r.width * dpr);
-    ch = Math.round(r.height * dpr);
-    if (canvas.width !== cw || canvas.height !== ch) {
-      canvas.width = cw;
-      canvas.height = ch;
-    }
+  const show = (i) => {
+    if (i === active) return;
+    active = i;
+    lines.forEach((el, k) => el.classList.toggle("is-on", k === i));
   };
 
-  // canvas não tem object-fit: cover — faz na mão.
-  const drawCover = (img) => {
-    if (!ready(img) || !cw || !ch) return;
-    const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-    const w = img.naturalWidth * s;
-    const h = img.naturalHeight * s;
-    ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
-  };
-
-  // ---- janela de decode, adaptativa à velocidade ----
-  // Decodificar TODO quadro da janela satura quando a rolagem é rápida (cada
-  // decode custa ~6ms). Quando o usuário acelera, espaçamos os quadros que
-  // pedimos: mostrar 1 em cada 3 durante uma rolagem veloz é imperceptível,
-  // travar não é.
-  const WINDOW = 22;
-  const MAX_INFLIGHT = 3; // decodes simultâneos
-  let lastDir = 1;
-  let speed = 0; // em quadros por frame de animação
-  let inflight = 0;
-  let queue = [];
-
-  const pump = () => {
-    while (inflight < MAX_INFLIGHT && queue.length) {
-      const img = images[queue.shift()];
-      if (!img || img.__warm || typeof img.decode !== "function") continue;
-      img.__warm = true;
-      inflight++;
-      img
-        .decode()
-        .then(() => { img.__decoded = true; })
-        .catch(() => { img.__warm = false; })
-        .finally(() => { inflight--; pump(); });
-    }
-  };
-
-  // Disparar a janela inteira de uma vez satura o decodificador (cada quadro
-  // custa ~6ms) e derruba o fps do scroll. Enfileiramos por proximidade e
-  // deixamos no máximo MAX_INFLIGHT em voo, então o quadro que o usuário
-  // precisa agora nunca fica atrás de 20 outros na fila.
-  const warmAround = (i) => {
-    // Se o render está pulando quadros (frameStep), não faz sentido decodificar
-    // os intermediários — eles nunca vão aparecer.
-    const step = Math.max(frameStep, 1, Math.min(4, Math.round(speed)));
-    const ahead = lastDir > 0 ? WINDOW : 4;
-    const behind = lastDir > 0 ? 4 : WINDOW;
-    const wanted = [];
-    for (let k = i - behind; k <= i + ahead; k += step) {
-      const idx = Math.max(0, Math.min(images.length - 1, k));
-      const img = images[idx];
-      if (img && !img.__warm) wanted.push(idx);
-    }
-    wanted.sort((a, b) => Math.abs(a - i) - Math.abs(b - i));
-    queue = wanted;
-    pump();
-  };
-
-  // Se o quadro pedido ainda não decodificou, usa o vizinho decodificado mais
-  // próximo — melhor um quadro levemente defasado que um engasgo.
-  const nearestReady = (i) => {
-    if (ready(images[i])) return images[i];
-    for (let d = 1; d < images.length; d++) {
-      if (ready(images[i - d])) return images[i - d];
-      if (ready(images[i + d])) return images[i + d];
-    }
-    return null;
-  };
-
-  // ---- geometry cache ----
-  let startY = 0, span = 1;
-  const measure = () => {
-    const rect = track.getBoundingClientRect();
-    startY = rect.top + window.scrollY;
-    span = Math.max(1, track.offsetHeight - window.innerHeight);
-    resize();
-  };
-
-  let target = 0, eased = 0, looping = false, inView = true, drawn = -1, activeLine = -1;
-  let frameStep = 1, emaFrame = 16.7, lastT = 0;
-
-  // ---- dica de movimento ----
-  // Parado no topo, a primeira tela é indistinguível de uma foto: o visitante
-  // não descobre que a rolagem controla o vídeo. Então, enquanto ninguém rolou,
-  // o vídeo anda sozinho um pouquinho e volta. Morre no primeiro scroll (e
-  // sozinho depois de algumas voltas, pra não segurar um rAF eterno na bateria).
-  const NUDGE_SPAN = 0.075;   // até 7,5% do vídeo (~9 quadros)
-  const NUDGE_MS = 2800;      // duração de uma ida e volta
-  const NUDGE_CYCLES = 6;
-  let nudging = !reduced, nudgeOffset = 0, nudgeT0 = 0;
-
-  // ---- rede de segurança: embutido em frame ----
-  // Dentro de um <iframe> (prévias, embeds) a rolagem muitas vezes não chega
-  // até aqui: quem rola é o container de fora, e window.scrollY fica em 0 para
-  // sempre — a primeira tela congela no quadro 1 e parece uma foto. Então, se
-  // estamos num frame, o vídeo já começa rodando sozinho em loop. O primeiro
-  // scroll de verdade desliga o loop e devolve o controle para o dedo.
-  const AUTO_MS = 16000; // uma volta completa no vídeo
-  let autoT0 = 0;
-  let framed = false;
-  try { framed = window.top !== window.self; } catch (e) { framed = true; }
-  let autoplay = framed && !reduced;
-  if (autoplay) nudging = false;
-  const stopNudge = () => {
-    if (!nudging) return;
-    nudging = false;
-    nudgeOffset = 0;
-    drawn = -1;
-  };
-
-  const readScroll = () => {
-    const next = clamp01((window.scrollY - startY) / span);
-    if (next > 0.001) {
-      stopNudge();
-      autoplay = false; // a rolagem chega até aqui: o dedo manda
-    }
-    if (next !== target) lastDir = next > target ? 1 : -1;
-    target = next;
-  };
-
-  const render = () => {
-    const p = eased;
-    const raw = clamp01(p + nudgeOffset) * (images.length - 1);
-    // frameStep > 1 em aparelho fraco: pulamos quadros para cortar decodes.
-    // Menos quadros distintos a 60fps é melhor que todos a 12fps.
-    const idx = Math.min(
-      images.length - 1,
-      frameStep > 1 ? Math.round(raw / frameStep) * frameStep : Math.round(raw)
-    );
-
-    if (idx !== drawn) {
-      const img = nearestReady(idx);
-      if (img) {
-        drawCover(img);
-        drawn = idx;
-      }
-      warmAround(idx);
-    }
-
-    // frase dominante — a última cujo data-at já passou
+  // A frase dominante é a última cujo data-at o vídeo já passou.
+  const syncLines = () => {
+    const d = video.duration;
+    if (!d || !isFinite(d)) return;
+    const p = video.currentTime / d;
     let want = 0;
     for (let i = 0; i < lines.length; i++) {
       if (p >= parseFloat(lines[i].dataset.at || "0")) want = i;
     }
-    if (want !== activeLine) {
-      lines.forEach((el, i) => el.classList.toggle("is-on", i === want));
-      activeLine = want;
-    }
-
-    if (cue) cue.classList.toggle("is-hidden", autoplay || p > 0.02);
+    show(want);
   };
-
-  const SMOOTH = 0.24;
-  const tick = (now) => {
-    // Qualidade adaptativa: mede o custo real dos frames e, se o aparelho não
-    // está dando conta, passa a pular quadros. Histerese (26/18ms) evita ficar
-    // oscilando entre os níveis.
-    if (lastT) {
-      const dt = now - lastT;
-      emaFrame = emaFrame * 0.85 + Math.min(dt, 200) * 0.15;
-      if (emaFrame > 26 && frameStep < 6) { frameStep++; emaFrame = 20; }
-      else if (emaFrame < 18 && frameStep > 1) { frameStep--; emaFrame = 20; }
-    }
-    lastT = now;
-
-    if (autoplay) {
-      if (!autoT0) autoT0 = now;
-      eased = target = ((now - autoT0) % AUTO_MS) / AUTO_MS;
-      render();
-      requestAnimationFrame(tick);
-      return;
-    }
-
-    if (nudging) {
-      if (!nudgeT0) nudgeT0 = now;
-      const elapsed = now - nudgeT0;
-      if (elapsed > NUDGE_MS * NUDGE_CYCLES) {
-        stopNudge();
-      } else {
-        // cosseno: sai de 0, vai até NUDGE_SPAN e volta, sem tranco nas pontas
-        const t = (elapsed % NUDGE_MS) / NUDGE_MS;
-        nudgeOffset = NUDGE_SPAN * (0.5 - 0.5 * Math.cos(t * Math.PI * 2));
-      }
-    }
-
-    const diff = target - eased;
-    // velocidade em quadros por frame, usada para espaçar o decode
-    speed = Math.abs(diff) * SMOOTH * (images.length - 1);
-    if (Math.abs(diff) < 0.0004 && !nudging) {
-      eased = target;
-      render();
-      looping = false;
-      lastT = 0;
-      return;
-    }
-    eased += diff * SMOOTH;
-    render();
-    requestAnimationFrame(tick);
-  };
-
-  const wake = () => {
-    if (looping || !inView) return;
-    looping = true;
-    requestAnimationFrame(tick);
-  };
-
-  measure();
 
   if (reduced) {
-    readScroll();
-    eased = target;
-    drawCover(nearestReady(0));
-    lines.forEach((el, i) => el.classList.toggle("is-on", i === 0));
+    // Sem movimento: fica no poster, com a primeira frase.
+    video.removeAttribute("autoplay");
+    video.load();
     return;
   }
 
-  if ("IntersectionObserver" in window) {
-    new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          inView = entry.isIntersecting;
-          if (inView) {
-            measure();
-            readScroll();
-            eased = target;
-            drawn = -1;
-            wake();
-          }
-        });
-      },
-      { rootMargin: "50% 0px" }
-    ).observe(section);
-  }
+  video.src = objectUrl || pickVideoSource();
+  video.addEventListener("timeupdate", syncLines);
 
-  window.addEventListener("scroll", () => { if (inView) { readScroll(); wake(); } }, { passive: true });
-
-  let rt;
-  const onResize = () => {
-    clearTimeout(rt);
-    rt = setTimeout(() => {
-      measure();
-      readScroll();
-      eased = target;
-      drawn = -1;
-      wake();
-    }, 120);
+  const play = () => {
+    const r = video.play();
+    // Se o navegador recusar o autoplay (política de energia, aba em segundo
+    // plano), o poster continua na tela e as frases passam a girar no tempo —
+    // a primeira tela nunca fica muda.
+    if (r && r.catch) r.catch(() => {
+      let i = 0;
+      setInterval(() => { i = (i + 1) % lines.length; show(i); }, 4200);
+    });
   };
-  window.addEventListener("resize", onResize, { passive: true });
-  window.addEventListener("orientationchange", onResize, { passive: true });
+  if (video.readyState >= 2) play();
+  else video.addEventListener("loadeddata", play, { once: true });
 
-  readScroll();
-  eased = target;
-  render();
-
-  // A checagem espera o layout assentar — medir cedo demais pega a página ainda
-  // sem altura. Se não há o que rolar, também cai no modo automático.
-  const checkScrollable = () => {
-    const doc = document.scrollingElement || document.documentElement;
-    if (!autoplay && doc.scrollHeight > window.innerHeight + 8) return;
-    autoplay = true;
-    stopNudge();
-    if (cue) cue.classList.add("is-hidden");
-    wake();
-  };
-  setTimeout(checkScrollable, 1500);
+  // Aba escondida: o navegador já pausa sozinho, mas garantir a volta evita
+  // o vídeo ficar congelado quando a pessoa retorna.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && video.paused) video.play().catch(() => {});
+  });
 }
 
 /* =========================================================
-   Loader — progresso real do download dos quadros
+   Loader — progresso real do download do vídeo
    ---------------------------------------------------------
-   A barra reflete quantos quadros já chegaram, não um timer falso. Se algo
-   falhar ou demorar demais, um timeout revela o site mesmo assim: ninguém
-   pode ficar preso na tela de carregamento por causa de um arquivo.
+   A barra reflete quantos bytes do vídeo já chegaram, não um timer falso: o
+   arquivo é baixado com fetch em pedaços e vira um blob que o <video> consome
+   já pronto — assim a primeira tela nunca começa engasgando. Se o navegador
+   não tiver streaming, ou algo falhar, o vídeo carrega do jeito normal.
+   Um prazo de 8s revela o site de qualquer forma: ninguém pode ficar preso na
+   tela de carregamento por causa de um arquivo.
    ========================================================= */
+// MP4/H.264 primeiro: é decodificado em hardware em praticamente todo aparelho,
+// o que pesa menos na bateria do celular. O WebM/VP9 cobre os navegadores sem
+// H.264 (algumas builds de Chromium e Firefox no Linux) e é menor.
+const VHERO_SOURCES = [
+  { src: "assets/video/oficina.mp4", type: 'video/mp4; codecs="avc1.42E01E"' },
+  { src: "assets/video/oficina.webm", type: 'video/webm; codecs="vp9"' },
+];
+
+function pickVideoSource() {
+  const probe = document.createElement("video");
+  for (const s of VHERO_SOURCES) {
+    if (probe.canPlayType(s.type)) return s.src;
+  }
+  return VHERO_SOURCES[0].src;
+}
+
 function setupLoader(onReady) {
   const loader = document.getElementById("loader");
   const bar = document.getElementById("loaderBar");
   const pct = document.getElementById("loaderPct");
-
-  const images = [];
-  let done = 0;
   let revealed = false;
 
-  const paint = () => {
-    const ratio = images.length ? done / images.length : 1;
-    if (bar) bar.style.transform = `scaleX(${ratio.toFixed(4)})`;
-    if (pct) pct.textContent = `${Math.round(ratio * 100)}%`;
+  const paint = (ratio) => {
+    const r = Math.max(0, Math.min(1, ratio));
+    if (bar) bar.style.transform = `scaleX(${r.toFixed(4)})`;
+    if (pct) pct.textContent = `${Math.round(r * 100)}%`;
   };
 
-  const reveal = async () => {
+  const reveal = (objectUrl) => {
     if (revealed) return;
     revealed = true;
-    if (bar) bar.style.transform = "scaleX(1)";
-    if (pct) pct.textContent = "100%";
-
-    // Decodifica os primeiros quadros antes de mostrar: sem isso a primeira
-    // tela aparece preta enquanto o quadro inicial ainda está decodificando.
-    const first = images.slice(0, 10).map((img) =>
-      img.decode
-        ? img.decode().then(() => { img.__decoded = true; img.__warm = true; }).catch(() => {})
-        : Promise.resolve()
-    );
-    await Promise.race([
-      Promise.all(first),
-      new Promise((r) => setTimeout(r, 1200)), // não segura a revelação por isso
-    ]);
-
+    paint(1);
     document.body.classList.remove("is-loading");
     if (loader) {
       loader.classList.add("is-done");
       setTimeout(() => loader.remove(), 600);
     }
-    onReady(images);
+    onReady(objectUrl);
   };
 
-  for (let i = 0; i < VHERO_FRAMES; i++) {
-    const img = new Image();
-    img.decoding = "async";
-    const step = () => {
-      done++;
-      paint();
-      if (done === images.length) reveal();
-    };
-    img.addEventListener("load", step, { once: true });
-    img.addEventListener("error", step, { once: true }); // erro também avança
-    img.src = vheroSrc(i);
-    images.push(img);
-  }
+  paint(0);
+  setTimeout(() => reveal(null), 8000);
 
-  paint();
-  if (!images.length) reveal();
+  const download = async () => {
+    if (!window.fetch || !window.ReadableStream) return reveal(null);
+    try {
+      const res = await fetch(pickVideoSource());
+      if (!res.ok || !res.body) return reveal(null);
 
-  // Rede lenta ou arquivo faltando não pode prender o visitante.
-  setTimeout(reveal, 8000);
+      const total = Number(res.headers.get("content-length")) || 0;
+      const reader = res.body.getReader();
+      const chunks = [];
+      let got = 0;
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        got += value.length;
+        // Sem content-length (resposta comprimida em stream) a barra avança por
+        // estimativa: melhor um progresso aproximado que uma barra parada.
+        paint(total ? got / total : Math.min(0.95, got / 3.6e6));
+      }
+      if (revealed) return; // o prazo de 8s já revelou; o vídeo entra normal
+      const tipo = res.headers.get("content-type") || "video/mp4";
+      reveal(URL.createObjectURL(new Blob(chunks, { type: tipo })));
+    } catch (e) {
+      reveal(null);
+    }
+  };
+
+  download();
 }
 
 /* =========================================================
@@ -898,7 +653,7 @@ function setupImageFallback() {
 // fonte, por exemplo) atrasaria o início do download dos quadros — e junto o
 // timeout de segurança, deixando o visitante olhando a tela de carregamento
 // por muito mais tempo do que os 8s previstos.
-setupLoader((frames) => setupVideoScrub(frames));
+setupLoader((videoUrl) => setupHeroVideo(videoUrl));
 
 const boot = () => {
   wireWhatsAppLinks();

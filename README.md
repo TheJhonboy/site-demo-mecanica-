@@ -66,54 +66,48 @@ Para usar fotos próprias, basta sobrescrever os arquivos mantendo os mesmos nom
 Recomendado: horizontais, proporção 4:3, ~800×600 ou maior. Fotos da própria oficina são
 o ideal. Nenhuma alteração de código é necessária.
 
-## O vídeo da primeira tela (scroll motion)
-A primeira coisa que o visitante vê é o vídeo da oficina em tela cheia, e a rolagem passa o
-vídeo quadro a quadro. Os 120 quadros ficam em `assets/video/frames/` e são desenhados num
-`<canvas>`; o vídeo original está em `assets/video/oficina.mp4`.
+## O vídeo da primeira tela
+A primeira coisa que o visitante vê é o vídeo da oficina rodando sozinho em loop, com uma
+frase curta no centro e o botão do WhatsApp. Não depende de rolagem: entra tocando.
 
-### Como os quadros foram gerados
+### Por que ele não estica no computador
+O material é **vertical, 720×1280**. Numa tela de 1920px de largura, preencher a largura
+toda ampliaria o vídeo quase 3× — fica borrado e esticado. Então no computador ele se
+encaixa pela **altura** (`object-fit: contain`) e as laterais ficam na cor do site. No
+celular, onde a tela também é vertical, ele preenche naturalmente (`object-fit: cover`),
+sem barra e sem distorção. A troca é feita por `@media (orientation: portrait)`.
+
+### Dois formatos
+| arquivo | codec | tamanho | para quem |
+|---|---|---|---|
+| `oficina.mp4` | H.264 | 3,5 MB | todo mundo — decodificado em hardware, poupa bateria |
+| `oficina.webm` | VP9 | 2,1 MB | navegadores sem H.264 (algumas builds de Chromium, Firefox no Linux) |
+
+O JavaScript escolhe com `canPlayType` e prefere o MP4. Os dois são mudos (a trilha de
+áudio foi removida — o vídeo toca sem som de qualquer forma).
+
+Para trocar o vídeo: substitua `assets/video/oficina.mp4`, gere o WebM e um novo poster:
 ```
-ffmpeg -i assets/video/oficina.mp4 \
-  -vf "fps=7.286,unsharp=5:5:0.35" -q:v 6 \
-  assets/video/frames/f-%03d.jpg
+ffmpeg -i novo.mp4 -c:v copy -an -movflags +faststart assets/video/oficina.mp4
+ffmpeg -i assets/video/oficina.mp4 -c:v libvpx-vp9 -crf 33 -b:v 0 -an assets/video/oficina.webm
+ffmpeg -i assets/video/oficina.mp4 -frames:v 1 -q:v 4 assets/video/poster.jpg
 ```
-`fps` = nº de quadros ÷ duração do vídeo (120 ÷ 16,47s). Para trocar o vídeo: substitua o mp4,
-rode o comando ajustando o `fps`, e atualize `VHERO_FRAMES` em `js/script.js`.
 
-### Por que não é 2K nem 60fps
-O material original é **720×1280 a 30fps**. Ampliar para 2K não cria detalhe que não existe —
-só deixa mais pesado e mais mole. E num scrub o "fps" não vem do arquivo: quem manda é a taxa
-de atualização da tela (o `requestAnimationFrame`), então 120 quadros já rodam a 60fps.
+### As frases
+As quatro frases trocam acompanhando o **tempo do vídeo**, não um cronômetro solto — a
+volta do loop e a volta das frases coincidem. Cada `<p class="vhero__line">` tem um
+`data-at` (0 a 1) dizendo em que ponto do vídeo ela assume. Para mudar os textos, edite
+direto no `index.html`.
 
-Testei 1080p com upscale antes de decidir: decodificar um quadro custava 26ms em WebP 1080 e
-custa 6ms em JPEG 720 nativo, contra um orçamento de 16,7ms por frame a 60fps. Ou seja, o
-upscale pagava caro sem entregar nitidez.
-
-### Medições (Playwright/Chromium, rolagem contínua)
-| cenário | FPS |
-|---|---|
-| Desktop 1440×900 | 59,9 |
-| Mobile 390×844 @DPR3 | 59,9 |
-| Mobile + CPU 4× e 6× mais lenta | 59,9 (com quadros pulados) |
-
-Carga até revelar: ~4,6s em 4G bom, ~13s em 4G fraco (6MB no total).
-
-### Quando a rolagem não chega até a página
-Dentro de um `<iframe>` (prévias, embeds), quem rola normalmente é o container de fora:
-`window.scrollY` fica em 0 para sempre e o scrub congelaria no primeiro quadro, fazendo a
-tela inicial parecer uma foto. Por isso, se o site detecta que está num frame, o vídeo já
-entra rodando sozinho em loop de 16s — e o primeiro scroll que de fato chegar desliga o
-loop e devolve o controle para o dedo. Numa aba normal do navegador nada disso acontece:
-o scrub é o comportamento padrão.
-
-Parado no topo de uma página normal, o vídeo também dá uma andadinha de ~9 quadros e volta,
-algumas vezes, junto com o aviso "role para ver o vídeo". Sem essa dica ninguém descobre que
-a rolagem controla o vídeo. Ela some no primeiro scroll.
+Se o navegador recusar o autoplay (política de economia de bateria, aba em segundo plano),
+o poster fica na tela e as frases passam a girar no tempo: a primeira tela nunca fica muda.
+Com `prefers-reduced-motion` ativado o vídeo não toca — fica só o poster.
 
 ### Tela de carregamento
-`#loader` mostra o progresso **real** do download dos quadros (não um timer falso) e trava a
-rolagem até terminar. Se algum arquivo falhar ou demorar, um timeout de 8s revela o site mesmo
-assim — ninguém pode ficar preso na tela de carregamento por causa de um arquivo.
+`#loader` mostra o progresso **real** do download do vídeo (não um timer falso): o arquivo
+é baixado em pedaços com `fetch` e vira um blob que o `<video>` consome já pronto, então a
+primeira tela não começa engasgando. Um prazo de 8s revela o site de qualquer forma —
+ninguém pode ficar preso na tela de carregamento por causa de um arquivo.
 
 ## A galeria de fotos com scroll (mais abaixo na página)
 A seção `#scrollshow` é um scrub controlado pelo scroll: as fotos são as frames e o

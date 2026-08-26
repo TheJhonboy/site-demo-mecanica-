@@ -174,6 +174,34 @@ funciona o modo automático dentro de frames.
 
 ---
 
+### 26/08/2026 · 16:20 — Vídeo de fundo rodando sozinho, sem esticar no computador
+`(este commit)` · *Troca o scrub por vídeo de fundo em loop, encaixado pela altura no desktop*
+
+**O que foi pedido:** você abriu o site publicado na Vercel, num monitor largo, e o vídeo
+estava **esticado e feio** — e continuava parecendo parado. Pediu: vídeo rodando de fundo,
+sem depender de rolagem, e cortando as laterais com barra na cor do site para ele caber
+numa resolução boa e ficar nítido no computador.
+
+**O que foi feito:**
+
+1. *Roda sozinho* — a primeira tela deixou de ser um scrub controlado pela rolagem e virou
+   um `<video>` normal, tocando em loop assim que carrega. A seção também encolheu de 450vh
+   para uma tela cheia: rolou uma vez, já está nos serviços.
+2. *Não estica mais* — o material é vertical (720×1280). Numa tela de 1920px, preencher a
+   largura ampliava o vídeo quase 3×, daí o borrão. Agora ele se encaixa pela **altura** e
+   as laterais ficam na cor do site. No celular, tela também vertical, ele preenche
+   naturalmente, sem barra.
+3. *Dois formatos* — MP4/H.264 (3,5 MB, decodificado em hardware, poupa bateria) e
+   WebM/VP9 (2,1 MB) para navegadores sem H.264. O áudio foi removido dos dois.
+4. *Mais leve* — os 120 quadros JPEG (6 MB) saíram do repositório; o vídeo é um arquivo só.
+   O carregamento caiu de ~4,6s para menos de 1s em rede boa.
+5. As frases agora trocam acompanhando o tempo do vídeo, então a volta do loop e a volta
+   das frases coincidem.
+
+**Arquivos:** `index.html`, `css/style.css`, `js/script.js`, `assets/video/` (WebM novo, MP4 sem áudio, 120 quadros removidos), `README.md`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços

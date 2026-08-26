@@ -489,25 +489,29 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
 /* ---------- Vídeo scroll-scrub (primeira tela) ----------
    Mesmo princípio da galeria abaixo, mas desenhando num <canvas>: são 180
    quadros, e 180 <img> em tela cheia no DOM seria peso morto. */
-.vhero{ position:relative; background:#000; }
-.vhero__track{ position:relative; height: 450vh; }
-.vhero__pin{
-  position:sticky; top:0;
+.vhero{ position:relative; background: var(--bg); }
+.vhero__stage{
+  position:relative;
   height:100vh;
   height:100svh;
   overflow:hidden;
-  background:#000;
+  /* Cor das barras laterais no computador. */
+  background: var(--bg);
 }
-.vhero__canvas{
+.vhero__video{
   position:absolute; inset:0;
   width:100%; height:100%;
   display:block;
-  /* Sem isso o canvas é re-rasterizado junto com o scroll do bloco sticky e o
-     scrub cai de 60 para 30fps (medido). Promovê-lo a camada própria deixa a
-     rolagem por conta do compositor. */
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
+  /* O material é vertical (720x1280). Numa tela larga, preencher a largura
+     ampliaria o vídeo 3x e ele ficaria borrado e esticado — então ele se
+     encaixa pela ALTURA e as laterais ficam na cor do site. */
+  object-fit: contain;
+  object-position: center;
+}
+/* Tela vertical (celular): o formato do vídeo casa com o da tela, então ele
+   preenche sem esticar nem sobrar barra. */
+@media (orientation: portrait){
+  .vhero__video{ object-fit: cover; }
 }
 .vhero__overlay{
   position:absolute; inset:0;
@@ -555,33 +559,22 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
 .vhero__cta{ position:relative; z-index:1; }
 
 .vhero__cue{
-  position:absolute; left:50%; bottom:24px;
+  position:absolute; left:50%; bottom:22px;
   transform: translateX(-50%);
-  display:flex; flex-direction:column; align-items:center; gap:4px;
-  color:#fff;
-  transition: opacity .4s ease;
+  color: rgba(255,255,255,.72);
+  transition: opacity .3s ease, color .2s ease;
 }
-.vhero__cue-txt{
-  font-size:.78rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
-  white-space:nowrap;
-  padding:6px 14px; border-radius:999px;
-  background: rgba(0,0,0,.42);
-  border:1px solid rgba(255,255,255,.22);
-  text-shadow:0 1px 2px rgba(0,0,0,.5);
-}
-.vhero__cue svg{ display:block; width:24px; height:24px; animation: bob 1.8s ease-in-out infinite; }
-.vhero__cue.is-hidden{ opacity:0; }
+.vhero__cue:hover{ color:#fff; }
+.vhero__cue svg{ display:block; width:26px; height:26px; animation: bob 1.8s ease-in-out infinite; }
 
 @media (max-width: 760px){
-  .vhero__track{ height: 380vh; }
   .vhero__content{ gap:28px; }
   .vhero__lines{ height: 5.4em; }
 }
 
 @media (prefers-reduced-motion: reduce){
-  .vhero__track{ height:auto; }
-  .vhero__pin{ position:relative; height:86svh; }
   .vhero__line{ transition:none; }
+  .vhero__cue svg{ animation:none; }
 }
 
 /* ---------- Scroll motion gallery (scroll-scrubbed, GPU-only) ----------
