@@ -319,6 +319,19 @@ function setupVideoScrub(preloaded) {
   const NUDGE_MS = 2800;      // duração de uma ida e volta
   const NUDGE_CYCLES = 6;
   let nudging = !reduced, nudgeOffset = 0, nudgeT0 = 0;
+
+  // ---- rede de segurança: embutido em frame ----
+  // Dentro de um <iframe> (prévias, embeds) a rolagem muitas vezes não chega
+  // até aqui: quem rola é o container de fora, e window.scrollY fica em 0 para
+  // sempre — a primeira tela congela no quadro 1 e parece uma foto. Então, se
+  // estamos num frame, o vídeo já começa rodando sozinho em loop. O primeiro
+  // scroll de verdade desliga o loop e devolve o controle para o dedo.
+  const AUTO_MS = 16000; // uma volta completa no vídeo
+  let autoT0 = 0;
+  let framed = false;
+  try { framed = window.top !== window.self; } catch (e) { framed = true; }
+  let autoplay = framed && !reduced;
+  if (autoplay) nudging = false;
   const stopNudge = () => {
     if (!nudging) return;
     nudging = false;
@@ -328,7 +341,10 @@ function setupVideoScrub(preloaded) {
 
   const readScroll = () => {
     const next = clamp01((window.scrollY - startY) / span);
-    if (next > 0.001) stopNudge();
+    if (next > 0.001) {
+      stopNudge();
+      autoplay = false; // a rolagem chega até aqui: o dedo manda
+    }
     if (next !== target) lastDir = next > target ? 1 : -1;
     target = next;
   };
@@ -362,7 +378,7 @@ function setupVideoScrub(preloaded) {
       activeLine = want;
     }
 
-    if (cue) cue.classList.toggle("is-hidden", p > 0.02);
+    if (cue) cue.classList.toggle("is-hidden", autoplay || p > 0.02);
   };
 
   const SMOOTH = 0.24;
@@ -377,6 +393,14 @@ function setupVideoScrub(preloaded) {
       else if (emaFrame < 18 && frameStep > 1) { frameStep--; emaFrame = 20; }
     }
     lastT = now;
+
+    if (autoplay) {
+      if (!autoT0) autoT0 = now;
+      eased = target = ((now - autoT0) % AUTO_MS) / AUTO_MS;
+      render();
+      requestAnimationFrame(tick);
+      return;
+    }
 
     if (nudging) {
       if (!nudgeT0) nudgeT0 = now;
@@ -458,6 +482,18 @@ function setupVideoScrub(preloaded) {
   readScroll();
   eased = target;
   render();
+
+  // A checagem espera o layout assentar — medir cedo demais pega a página ainda
+  // sem altura. Se não há o que rolar, também cai no modo automático.
+  const checkScrollable = () => {
+    const doc = document.scrollingElement || document.documentElement;
+    if (!autoplay && doc.scrollHeight > window.innerHeight + 8) return;
+    autoplay = true;
+    stopNudge();
+    if (cue) cue.classList.add("is-hidden");
+    wake();
+  };
+  setTimeout(checkScrollable, 1500);
 }
 
 /* =========================================================
