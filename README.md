@@ -29,21 +29,33 @@ Em `index.html`:
 - Depoimentos, marcas e demais textos são exemplos genéricos — ajuste conforme a oficina real.
 - O JSON-LD (dados estruturados) no `<head>` usa os mesmos dados fictícios — atualize junto.
 
-## Fotos — os arquivos atuais são PLACEHOLDERS
-As 11 imagens em `assets/img/` **não são fotos reais**: são placeholders gerados
-localmente (fundo escuro + ícone + nome do serviço + o selo "IMAGEM DEMO"). Existem
-só para o layout e a animação ficarem apresentáveis e testáveis.
+## Fotos dos serviços — recortadas do próprio vídeo
+As 11 imagens em `assets/img/` são recortes do vídeo em `assets/video/oficina.mp4`
+(mesmo carro, mesma luz), o que dá identidade visual coesa ao site inteiro. Não são
+mais os placeholders com o selo "IMAGEM DEMO".
 
-Para usar fotos de verdade, basta sobrescrever os arquivos mantendo os mesmos nomes:
+Duas ressalvas honestas: o vídeo mostra um carro pronto, não a oficina trabalhando.
+Então **Motor** e **Bateria** ficaram com imagem de contexto (frente e traseira do
+carro) em vez de foto do serviço em si — troque essas duas primeiro quando tiver
+fotos reais. Os outros oito casam bem com o serviço: roda com pinça de freio, farol,
+painel, bancos, retrovisor.
+
+Comando usado (ajuste `-ss` para o instante e o offset do `crop` para o enquadramento):
+```
+ffmpeg -ss 4.6 -i assets/video/oficina.mp4 -frames:v 1 \
+  -vf "crop=720:540:0:296,scale=800:600:flags=lanczos,unsharp=5:5:0.3" -q:v 5 \
+  assets/img/servico-freios.jpg
+```
+
+Para usar fotos próprias, basta sobrescrever os arquivos mantendo os mesmos nomes:
 
 `hero-oficina.jpg`, `servico-motor.jpg`, `servico-pneus.jpg`, `servico-revisao.jpg`,
 `servico-freios.jpg`, `servico-suspensao.jpg`, `servico-eletrica.jpg`,
 `servico-bateria.jpg`, `servico-arcondicionado.jpg`, `servico-estofamento.jpg`,
 `servico-diagnostico.jpg`
 
-Recomendado: horizontais, ~1600px de largura, licença livre para uso comercial
-(Unsplash License / Pexels License) ou fotos da própria oficina. Nenhuma alteração
-de código é necessária.
+Recomendado: horizontais, proporção 4:3, ~800×600 ou maior. Fotos da própria oficina são
+o ideal. Nenhuma alteração de código é necessária.
 
 ## O vídeo da primeira tela (scroll motion)
 A primeira coisa que o visitante vê é o vídeo da oficina em tela cheia, e a rolagem passa o
