@@ -19,6 +19,20 @@ const CONFIG = {
     5: [8, 18],
     6: [8, 13],
   },
+
+  // Movimento estimado por hora, no estilo "horários de pico" do Google.
+  // 0 = domingo ... 6 = sábado; null = fechado. Cada número é 0–100 e
+  // corresponde a uma hora, começando na primeira hora de businessHours.
+  // São valores FICTÍCIOS — troque pelo movimento real da oficina.
+  popularTimes: {
+    0: null,
+    1: [88, 96, 90, 72, 38, 44, 68, 78, 74, 58, 34],
+    2: [62, 74, 70, 58, 30, 36, 55, 62, 58, 46, 26],
+    3: [55, 66, 63, 52, 28, 33, 50, 58, 54, 42, 24],
+    4: [58, 70, 68, 55, 30, 35, 54, 63, 60, 48, 28],
+    5: [76, 88, 84, 68, 36, 42, 66, 80, 86, 70, 40],
+    6: [92, 100, 94, 76, 52, 30],
+  },
 };
 
 function buildWhatsAppLink(message) {
@@ -296,15 +310,32 @@ function setupVideoScrub(preloaded) {
   let target = 0, eased = 0, looping = false, inView = true, drawn = -1, activeLine = -1;
   let frameStep = 1, emaFrame = 16.7, lastT = 0;
 
+  // ---- dica de movimento ----
+  // Parado no topo, a primeira tela é indistinguível de uma foto: o visitante
+  // não descobre que a rolagem controla o vídeo. Então, enquanto ninguém rolou,
+  // o vídeo anda sozinho um pouquinho e volta. Morre no primeiro scroll (e
+  // sozinho depois de algumas voltas, pra não segurar um rAF eterno na bateria).
+  const NUDGE_SPAN = 0.075;   // até 7,5% do vídeo (~9 quadros)
+  const NUDGE_MS = 2800;      // duração de uma ida e volta
+  const NUDGE_CYCLES = 6;
+  let nudging = !reduced, nudgeOffset = 0, nudgeT0 = 0;
+  const stopNudge = () => {
+    if (!nudging) return;
+    nudging = false;
+    nudgeOffset = 0;
+    drawn = -1;
+  };
+
   const readScroll = () => {
     const next = clamp01((window.scrollY - startY) / span);
+    if (next > 0.001) stopNudge();
     if (next !== target) lastDir = next > target ? 1 : -1;
     target = next;
   };
 
   const render = () => {
     const p = eased;
-    const raw = p * (images.length - 1);
+    const raw = clamp01(p + nudgeOffset) * (images.length - 1);
     // frameStep > 1 em aparelho fraco: pulamos quadros para cortar decodes.
     // Menos quadros distintos a 60fps é melhor que todos a 12fps.
     const idx = Math.min(
@@ -347,10 +378,22 @@ function setupVideoScrub(preloaded) {
     }
     lastT = now;
 
+    if (nudging) {
+      if (!nudgeT0) nudgeT0 = now;
+      const elapsed = now - nudgeT0;
+      if (elapsed > NUDGE_MS * NUDGE_CYCLES) {
+        stopNudge();
+      } else {
+        // cosseno: sai de 0, vai até NUDGE_SPAN e volta, sem tranco nas pontas
+        const t = (elapsed % NUDGE_MS) / NUDGE_MS;
+        nudgeOffset = NUDGE_SPAN * (0.5 - 0.5 * Math.cos(t * Math.PI * 2));
+      }
+    }
+
     const diff = target - eased;
     // velocidade em quadros por frame, usada para espaçar o decode
     speed = Math.abs(diff) * SMOOTH * (images.length - 1);
-    if (Math.abs(diff) < 0.0004) {
+    if (Math.abs(diff) < 0.0004 && !nudging) {
       eased = target;
       render();
       looping = false;
@@ -484,6 +527,105 @@ function setupLoader(onReady) {
 
   // Rede lenta ou arquivo faltando não pode prender o visitante.
   setTimeout(reveal, 8000);
+}
+
+/* =========================================================
+   Movimento da semana — gráfico no estilo "horários de pico" do Google.
+   Os dados vivem em CONFIG.popularTimes; aqui só desenhamos.
+   ========================================================= */
+function setupPopularTimes() {
+  const root = document.getElementById("popular");
+  const daysEl = document.getElementById("popularDays");
+  const chartEl = document.getElementById("popularChart");
+  const statusEl = document.getElementById("popularStatus");
+  if (!root || !daysEl || !chartEl || !statusEl) return;
+
+  const SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const FULL = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+  const ORDER = [1, 2, 3, 4, 5, 6, 0]; // a semana começa na segunda
+  const now = new Date();
+  const today = now.getDay();
+
+  const level = (v) => (v >= 72 ? "full" : v >= 40 ? "busy" : "calm");
+  const LABEL = { calm: "tranquilo", busy: "movimentado", full: "lotado" };
+  const hourLabel = (h) => `${String(h).padStart(2, "0")}h`;
+
+  const render = (day) => {
+    const data = CONFIG.popularTimes[day];
+    const hours = CONFIG.businessHours[day];
+    chartEl.textContent = "";
+
+    if (!data || !hours) {
+      chartEl.classList.add("is-closed");
+      const p = document.createElement("p");
+      p.className = "popular__closed";
+      p.textContent = "Fechado";
+      chartEl.appendChild(p);
+      statusEl.innerHTML = `<strong>${FULL[day]}</strong>: a oficina não abre.`;
+      return;
+    }
+    chartEl.classList.remove("is-closed");
+
+    const peak = data.indexOf(Math.max.apply(null, data));
+    const calm = data.indexOf(Math.min.apply(null, data));
+    const nowIdx = day === today ? now.getHours() - hours[0] : -1;
+
+    data.forEach((v, i) => {
+      const h = hours[0] + i;
+      const col = document.createElement("div");
+      col.className = `popular__bar is-${level(v)}`;
+      if (i === nowIdx) col.classList.add("is-now");
+      col.title = `${hourLabel(h)} — ${LABEL[level(v)]}`;
+
+      const fill = document.createElement("span");
+      fill.style.height = `${Math.max(8, v)}%`;
+      fill.style.animationDelay = `${i * 35}ms`;
+      col.appendChild(fill);
+
+      // rótulo de 2 em 2 horas: no celular todos não cabem
+      if (i % 2 === 0 || i === data.length - 1) {
+        const lab = document.createElement("small");
+        lab.textContent = hourLabel(h);
+        col.appendChild(lab);
+      }
+      chartEl.appendChild(col);
+    });
+
+    const peakH = hourLabel(hours[0] + peak);
+    const calmH = hourLabel(hours[0] + calm);
+    const nowLevel = nowIdx >= 0 && nowIdx < data.length ? level(data[nowIdx]) : null;
+    statusEl.innerHTML =
+      nowLevel === "calm"
+        ? `Agora costuma ficar <strong>tranquilo</strong> — boa hora pra passar aqui.`
+        : nowLevel
+        ? `Agora costuma ficar <strong>${LABEL[nowLevel]}</strong>. Mais tranquilo às ${calmH}.`
+        : `<strong>${FULL[day]}</strong>: mais cheio às ${peakH}, mais tranquilo às ${calmH}.`;
+  };
+
+  ORDER.forEach((d) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "popular__day";
+    b.textContent = SHORT[d];
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", "false");
+    b.setAttribute("aria-label", FULL[d]);
+    if (d === today) b.classList.add("is-today");
+    b.addEventListener("click", () => {
+      daysEl.querySelectorAll(".popular__day").forEach((x) => {
+        x.classList.remove("is-active");
+        x.setAttribute("aria-selected", "false");
+      });
+      b.classList.add("is-active");
+      b.setAttribute("aria-selected", "true");
+      render(d);
+    });
+    daysEl.appendChild(b);
+  });
+
+  // abre no dia de hoje
+  const start = daysEl.children[ORDER.indexOf(today)];
+  if (start) start.click();
 }
 
 /* =========================================================
@@ -731,6 +873,7 @@ const boot = () => {
   setupRevealOnScroll();
   setupCountUp();
   setupScrollShow();
+  setupPopularTimes();
   setupImageFallback();
 
   const yearEl = document.getElementById("year");

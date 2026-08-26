@@ -555,10 +555,19 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
 .vhero__cta{ position:relative; z-index:1; }
 
 .vhero__cue{
-  position:absolute; left:50%; bottom:20px;
+  position:absolute; left:50%; bottom:24px;
   transform: translateX(-50%);
-  color: rgba(255,255,255,.6);
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  color:#fff;
   transition: opacity .4s ease;
+}
+.vhero__cue-txt{
+  font-size:.78rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+  white-space:nowrap;
+  padding:6px 14px; border-radius:999px;
+  background: rgba(0,0,0,.42);
+  border:1px solid rgba(255,255,255,.22);
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
 }
 .vhero__cue svg{ display:block; width:24px; height:24px; animation: bob 1.8s ease-in-out infinite; }
 .vhero__cue.is-hidden{ opacity:0; }
@@ -754,29 +763,85 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
   font-family:'Poppins',sans-serif; font-weight:600;
   margin-bottom:18px; font-size:1rem;
 }
-.calendar-grid{
-  display:grid;
-  grid-template-columns: 56px repeat(7, 1fr);
-  gap:6px;
-  align-items:center;
+/* ---------- Movimento da semana (estilo "horários de pico") ----------
+   As barras crescem com transform: scaleY (compositor), não com height —
+   animar height dispararia layout em cada uma das 11 colunas. */
+.popular__days{
+  display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;
 }
-.calendar-grid__day{
-  text-align:center; font-size:.75rem; font-weight:700;
-  color: var(--dim-ink); text-transform:uppercase;
+.popular__day{
+  flex:1 1 0; min-width:38px;
+  font: inherit; font-size:.78rem; font-weight:600;
+  padding:8px 0; border-radius:999px;
+  border:1px solid var(--light-border);
+  background: var(--light-surface);
+  color: var(--dim-ink);
+  cursor:pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
-.calendar-grid__row{
-  font-size:.75rem; font-weight:600; color: var(--dim-ink);
+.popular__day:hover{ border-color: var(--primary); color: var(--dark-ink); }
+.popular__day.is-today::after{
+  content:""; display:block; width:4px; height:4px; border-radius:50%;
+  background: var(--primary); margin:3px auto 0;
 }
-.slot{ height:26px; border-radius:6px; }
-.slot--open{ background: rgba(37,211,102,.25); }
-.slot--closed{ background: rgba(0,0,0,.08); }
+.popular__day.is-active{
+  background: var(--dark-ink); border-color: var(--dark-ink); color:#fff;
+}
+.popular__day.is-active.is-today::after{ background: var(--primary-light); }
+
+.popular__status{
+  font-size:.88rem; color: var(--dim-ink); margin:0 0 14px;
+}
+.popular__status strong{ color: var(--dark-ink); }
+
+.popular__chart{
+  display:flex; align-items:flex-end; gap:5px;
+  height:132px; padding-bottom:20px;
+  border-bottom:1px solid var(--light-border);
+}
+.popular__bar{
+  position:relative; flex:1 1 0;
+  height:100%; display:flex; align-items:flex-end;
+}
+.popular__bar span{
+  display:block; width:100%; border-radius:5px 5px 2px 2px;
+  transform: scaleY(0); transform-origin: bottom;
+  animation: barGrow .5s cubic-bezier(.2,.8,.3,1) forwards;
+}
+.popular__bar.is-calm span{ background: rgba(255,106,26,.28); }
+.popular__bar.is-busy span{ background: rgba(255,106,26,.6); }
+.popular__bar.is-full span{ background: var(--primary); }
+.popular__bar.is-now span{ box-shadow: 0 0 0 2px var(--dark-ink); }
+.popular__bar.is-now::before{
+  content:"agora"; position:absolute; top:-16px; left:50%;
+  transform:translateX(-50%);
+  font-size:.6rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.06em; color: var(--dark-ink); white-space:nowrap;
+}
+.popular__bar small{
+  position:absolute; bottom:-19px; left:50%; transform:translateX(-50%);
+  font-size:.64rem; color: var(--dim-ink); white-space:nowrap;
+}
+.popular__chart.is-closed{
+  align-items:center; justify-content:center; padding-bottom:0;
+}
+.popular__closed{
+  margin:0; font-weight:600; color: var(--dim-ink);
+}
+@keyframes barGrow{ to{ transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce){
+  .popular__bar span{ animation:none; transform:scaleY(1); }
+}
+
 .calendar-card__legend{
-  display:flex; gap:18px; margin-top:16px; font-size:.8rem; color: var(--dim-ink);
+  display:flex; gap:18px; margin-top:20px; font-size:.8rem; color: var(--dim-ink);
+  flex-wrap:wrap;
 }
 .calendar-card__legend span{ display:inline-flex; align-items:center; gap:6px; }
 .legend-dot{ width:10px; height:10px; border-radius:3px; display:inline-block; }
-.legend-dot--open{ background: rgba(37,211,102,.6); }
-.legend-dot--closed{ background: rgba(0,0,0,.15); }
+.legend-dot--calm{ background: rgba(255,106,26,.28); }
+.legend-dot--busy{ background: rgba(255,106,26,.6); }
+.legend-dot--full{ background: var(--primary); }
 .calendar-card__note{ font-size:.8rem; margin: 14px 0 0; }
 
 /* ---------- Testimonials ---------- */
@@ -1021,8 +1086,9 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
   .hamburger{ display:flex; }
   .hero__stats{ grid-template-columns: repeat(2,1fr); }
   .hours__table td{ font-size:.9rem; }
-  .calendar-grid{ grid-template-columns: 40px repeat(7,1fr); gap:4px; }
-  .calendar-grid__day{ font-size:.62rem; }
+  .popular__chart{ height:112px; gap:3px; }
+  .popular__day{ font-size:.72rem; min-width:0; }
+  .popular__bar small{ font-size:.58rem; }
   .footer__grid{ grid-template-columns:1fr; }
   .footer__bottom-inner{ flex-direction:column; text-align:center; }
 }

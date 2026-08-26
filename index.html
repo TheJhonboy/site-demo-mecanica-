@@ -126,6 +126,7 @@
         </div>
 
         <div class="vhero__cue" aria-hidden="true">
+          <span class="vhero__cue-txt">role para ver o vídeo</span>
           <svg viewBox="0 0 24 24" fill="none"><polyline points="6,9 12,15 18,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
@@ -455,22 +456,23 @@
 
       <div class="hours__calendar">
         <div class="calendar-card">
-          <div class="calendar-card__head">Agenda semanal — visão geral</div>
-          <div class="calendar-grid">
-            <div class="calendar-grid__corner"></div>
-            <div class="calendar-grid__day">Seg</div><div class="calendar-grid__day">Ter</div><div class="calendar-grid__day">Qua</div><div class="calendar-grid__day">Qui</div><div class="calendar-grid__day">Sex</div><div class="calendar-grid__day">Sáb</div><div class="calendar-grid__day">Dom</div>
+          <div class="calendar-card__head">Movimento da semana</div>
 
-            <div class="calendar-grid__row">Manhã</div>
-            <div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--closed"></div>
+          <!-- Gráfico de movimento no estilo "horários de pico" do Google.
+               Os números vivem em CONFIG.popularTimes (js/script.js) e são
+               fictícios — troque pelo movimento real da oficina. -->
+          <div class="popular" id="popular">
+            <div class="popular__days" role="tablist" aria-label="Dia da semana" id="popularDays"></div>
+            <p class="popular__status" id="popularStatus"></p>
+            <div class="popular__chart" id="popularChart" aria-hidden="true"></div>
+            <div class="popular__legend">
+              <span><i class="legend-dot legend-dot--calm"></i> Tranquilo</span>
+              <span><i class="legend-dot legend-dot--busy"></i> Movimentado</span>
+              <span><i class="legend-dot legend-dot--full"></i> Lotado</span>
+            </div>
+          </div>
 
-            <div class="calendar-grid__row">Tarde</div>
-            <div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--open"></div><div class="slot slot--closed"></div><div class="slot slot--closed"></div>
-          </div>
-          <div class="calendar-card__legend">
-            <span><i class="legend-dot legend-dot--open"></i> Disponível</span>
-            <span><i class="legend-dot legend-dot--closed"></i> Fechado</span>
-          </div>
-          <p class="calendar-card__note">Visão geral da semana. Para o horário exato disponível hoje, confirme pelo WhatsApp.</p>
+          <p class="calendar-card__note">Estimativa de movimento por horário. Para garantir vaga no horário que você quer, confirme pelo WhatsApp.</p>
         </div>
       </div>
     </div>
