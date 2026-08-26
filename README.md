@@ -4,7 +4,7 @@ Site demonstrativo para uma oficina mecânica ("Klaus"), focado em levar o visit
 Site estático (HTML/CSS/JS puro, sem build) com:
 - Seções de serviços (motor, pneus, revisão, freios, suspensão, elétrica, bateria, ar-condicionado, estofamento, diagnóstico);
 - Marcas atendidas (Honda, Chevrolet, Volkswagen, Fiat, Hyundai, Toyota, Renault, Ford, Nissan...);
-- Horários de funcionamento + agenda semanal ilustrativa;
+- Horários de funcionamento + gráfico de movimento da semana (estilo "horários de pico" do Google);
 - Localização com endereço fictício e mapa incorporado;
 - Bloco de Instagram e depoimentos;
 - Botão flutuante e vários CTAs de WhatsApp com mensagem pré-preenchida por serviço.
@@ -22,6 +22,11 @@ Edite `js/script.js`, no topo do arquivo, o objeto `CONFIG`:
 - `whatsappNumber`: número real da oficina (só dígitos, com DDI 55 + DDD).
 - `instagramUrl`: link do Instagram real da oficina.
 - `businessHours`: horário de funcionamento usado no indicador "Aberto agora".
+- `popularTimes`: movimento estimado por hora, que alimenta o gráfico da seção
+  "Horários". Cada dia é uma lista de números de 0 a 100, uma posição por hora,
+  começando na primeira hora de `businessHours` daquele dia. `null` = fechado.
+  Abaixo de 40 aparece como "tranquilo", de 40 a 71 "movimentado", 72 ou mais
+  "lotado".
 
 Em `index.html`:
 - Endereço, telefone e e-mail aparecem na topbar, na seção "Localização" e no rodapé — troque pelos dados reais.
@@ -88,6 +93,18 @@ upscale pagava caro sem entregar nitidez.
 | Mobile + CPU 4× e 6× mais lenta | 59,9 (com quadros pulados) |
 
 Carga até revelar: ~4,6s em 4G bom, ~13s em 4G fraco (6MB no total).
+
+### Quando a rolagem não chega até a página
+Dentro de um `<iframe>` (prévias, embeds), quem rola normalmente é o container de fora:
+`window.scrollY` fica em 0 para sempre e o scrub congelaria no primeiro quadro, fazendo a
+tela inicial parecer uma foto. Por isso, se o site detecta que está num frame, o vídeo já
+entra rodando sozinho em loop de 16s — e o primeiro scroll que de fato chegar desliga o
+loop e devolve o controle para o dedo. Numa aba normal do navegador nada disso acontece:
+o scrub é o comportamento padrão.
+
+Parado no topo de uma página normal, o vídeo também dá uma andadinha de ~9 quadros e volta,
+algumas vezes, junto com o aviso "role para ver o vídeo". Sem essa dica ninguém descobre que
+a rolagem controla o vídeo. Ela some no primeiro scroll.
 
 ### Tela de carregamento
 `#loader` mostra o progresso **real** do download dos quadros (não um timer falso) e trava a
