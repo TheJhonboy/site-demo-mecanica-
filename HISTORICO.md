@@ -322,6 +322,50 @@ variedade de enquadramento não substitui foto de serviço de verdade.
 
 ---
 
+### 27/08/2026 · 17:22 — Fim das barras pretas na primeira tela
+`(este commit)` · *Põe o vídeo desfocado ao fundo e aumenta o nítido no centro*
+
+**O que foi pedido:** você abriu a prévia e disse que a primeira tela ficou feia no
+computador — *"cortou a imagem, ficou amarronada, preta nas laterais, uma coisa esquisita"*
+— e que era para **cortar só um pouquinho as laterais**, não encher de barra.
+
+**Eu errei antes, e vale registrar por quê.** Na conversa anterior você tinha dito "corte as
+laterais, deixa uma barra preta", mas emendou que ia pensar numa ideia melhor. Eu fui pelo
+caminho literal: encaixei o vídeo pela altura e pintei as laterais. Numa tela de 1400px isso
+deixava o vídeo numa faixa de 495px — **dois terços da tela em preto morto**. Não parecia
+decisão de design, parecia buraco. E, num quadro tão estreito, o movimento quase não se
+percebe: é parte da razão de você continuar vendo a tela como parada.
+
+**Por que não dava para simplesmente preencher:** o vídeo é 720×1280 (em pé) e a tela do
+computador é deitada. As duas proporções são quase 3× diferentes. Preencher a largura
+ampliava o vídeo 2× e cortava 70% da altura — foi o "repuxado" que você reclamou antes.
+Encaixar pela altura deixava as barras. Não existe meio-termo entre os dois.
+
+**O que foi feito** — a saída que Instagram e YouTube usam para vídeo em pé:
+
+1. *O fundo virou o próprio vídeo* — uma segunda cópia preenche a tela inteira, ampliada e
+   desfocada. As laterais passam a carregar a cor e o movimento da cena, em vez de preto.
+   O contraste do desfoque é reduzido de propósito: sem isso, as cenas escuras do interior
+   do carro voltavam a virar duas barras pretas.
+2. *O vídeo nítido ficou maior* — antes ocupava 35% da largura; agora ocupa 58%, com teto de
+   936px. Esse teto é 1,3× o tamanho original: é o limite em que ainda não aparece borrão.
+   Em telas até 1100px ele nem chega a ser ampliado — fica menor que o original, ou seja,
+   mais nítido ainda.
+3. *No celular nada mudou* — a tela também é vertical, o vídeo preenche sozinho. O vídeo de
+   fundo fica escondido **e pausado**, para não gastar bateria decodificando o que ninguém vê.
+4. *Os dois andam juntos* — se a distância entre eles passa de meio segundo, o de trás é
+   recolocado no ponto do da frente. Desfocado, ninguém nota o ajuste.
+
+**Medido em navegador:** 1920px → vídeo com 936px (49% da tela, ampliação 1,30×);
+1400px → 812px (58%, 1,13×); 1100px → 638px (58%, 0,89×, sem ampliar nada);
+celular → 100% da tela, fundo desligado e pausado. Os dois vídeos em sincronia (2 a 3
+centésimos de diferença). Sem erros de JavaScript, e o destravamento por toque continua
+funcionando com o autoplay bloqueado.
+
+**Arquivos:** `index.html`, `css/style.css`, `js/script.js`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços

@@ -103,12 +103,17 @@
 <main id="conteudo">
 
   <!-- ===== VÍDEO DE FUNDO (primeira tela) =====
-       O vídeo roda sozinho em loop. É vertical (720x1280): no computador ele
-       se encaixa pela altura (object-fit: contain) e as laterais ficam na cor
-       do site — esticar para a largura toda o ampliaria de 720 para 2000px e
-       ficaria borrado. No celular, tela vertical, ele preenche naturalmente. -->
+       O vídeo roda sozinho em loop. É vertical (720x1280) e a tela do
+       computador é larga, então são dois: o de trás preenche a tela ampliado e
+       desfocado, dando cor e movimento às laterais, e o da frente fica nítido
+       no centro, no maior tamanho que não borra. No celular a tela também é
+       vertical: o da frente preenche sozinho e o de trás é desligado. -->
   <section class="vhero" id="vhero" aria-label="Apresentação da oficina">
     <div class="vhero__stage">
+      <video class="vhero__fundo" id="vheroFundo"
+             poster="assets/video/poster.jpg"
+             muted loop playsinline autoplay preload="auto"
+             aria-hidden="true" tabindex="-1"></video>
       <video class="vhero__video" id="vheroVideo"
              poster="assets/video/poster.jpg"
              muted loop playsinline autoplay preload="auto"

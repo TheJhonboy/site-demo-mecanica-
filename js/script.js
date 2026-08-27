@@ -184,6 +184,18 @@ function setupHeroVideo(objectUrl) {
   const video = document.getElementById("vheroVideo");
   if (!section || !video) return;
 
+  // O vídeo de trás só existe para preencher as laterais no computador,
+  // desfocado. Numa tela vertical ele não aparece — e aí fica pausado, para não
+  // gastar bateria decodificando um vídeo que ninguém vê.
+  const fundo = document.getElementById("vheroFundo");
+  const deitada = window.matchMedia("(orientation: landscape)");
+  const ajustarFundo = () => {
+    if (!fundo) return;
+    if (!deitada.matches) return fundo.pause();
+    if (!video.paused && fundo.paused) fundo.play().catch(() => {});
+  };
+  if (deitada.addEventListener) deitada.addEventListener("change", ajustarFundo);
+
   const lines = Array.from(section.querySelectorAll(".vhero__line"));
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let active = 0;
@@ -207,13 +219,15 @@ function setupHeroVideo(objectUrl) {
   };
 
   if (reduced) {
-    // Sem movimento: fica no poster, com a primeira frase.
+    // Sem movimento: os dois ficam no poster, com a primeira frase.
     video.removeAttribute("autoplay");
     video.load();
+    if (fundo) { fundo.removeAttribute("autoplay"); fundo.load(); }
     return;
   }
 
   video.src = objectUrl || pickVideoSource();
+  if (fundo) fundo.src = video.src;
   video.addEventListener("timeupdate", syncLines);
 
   // Enquanto o vídeo não estiver tocando, as frases giram no relógio — assim a
@@ -246,6 +260,20 @@ function setupHeroVideo(objectUrl) {
   ["playing", "play", "pause", "waiting", "stalled", "ended", "error"].forEach(
     (e) => video.addEventListener(e, decidirRelogio)
   );
+
+  // O fundo segue a frente: mesmo estado e mesmo ponto do loop. Se a distância
+  // passar de meio segundo (os dois decodificam separados e podem se afastar),
+  // ele é recolocado no lugar — desfocado ninguém nota o salto.
+  if (fundo) {
+    video.addEventListener("play", ajustarFundo);
+    video.addEventListener("pause", () => fundo.pause());
+    video.addEventListener("timeupdate", () => {
+      if (fundo.paused) return;
+      if (Math.abs(fundo.currentTime - video.currentTime) > 0.5) {
+        fundo.currentTime = video.currentTime;
+      }
+    });
+  }
 
   // Safari no modo de baixo consumo, economia de dados e algumas políticas de
   // energia recusam o autoplay mesmo com o vídeo mudo. Nesse caso o poster fica

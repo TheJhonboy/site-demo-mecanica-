@@ -495,23 +495,44 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
   height:100vh;
   height:100svh;
   overflow:hidden;
-  /* Cor das barras laterais no computador. */
   background: var(--bg);
 }
-.vhero__video{
+/* O material é vertical (720x1280) e a tela do computador é larga: as duas
+   proporções são quase 3x diferentes. Preencher a largura ampliaria o vídeo 2x
+   e cortaria quase toda a altura; encaixar pela altura deixava dois terços da
+   tela em preto morto. A saída é a de sempre para vídeo vertical: o mesmo vídeo
+   ao fundo, ampliado e desfocado, para as laterais carregarem a cor e o
+   movimento da cena — e o vídeo nítido por cima, o maior possível sem borrar. */
+.vhero__fundo{
   position:absolute; inset:0;
   width:100%; height:100%;
-  display:block;
-  /* O material é vertical (720x1280). Numa tela larga, preencher a largura
-     ampliaria o vídeo 3x e ele ficaria borrado e esticado — então ele se
-     encaixa pela ALTURA e as laterais ficam na cor do site. */
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  /* A escala esconde a borda clara que o desfoque cria nos cantos. O contraste
+     reduzido é o que impede a lateral de virar preto puro nas cenas escuras do
+     vídeo — sem ele, o interior do carro deixava de novo duas barras pretas. */
+  transform: scale(1.2);
+  filter: blur(34px) saturate(1.45) brightness(.9) contrast(.78);
+  pointer-events:none;
 }
-/* Tela vertical (celular): o formato do vídeo casa com o da tela, então ele
-   preenche sem esticar nem sobrar barra. */
+.vhero__video{
+  position:absolute; top:0; left:50%;
+  transform: translateX(-50%);
+  height:100%;
+  /* 720px é o tamanho nativo: aí a imagem fica 1:1, sem ampliar nada. O teto de
+     936px é 1,3x, o limite em que ainda não aparece borrão. */
+  width: min(100%, 58vw, 936px);
+  object-fit: cover;
+  display:block;
+}
+/* Tela vertical (celular): o formato do vídeo casa com o da tela, ele preenche
+   sozinho e o fundo desfocado não tem função nenhuma. */
 @media (orientation: portrait){
-  .vhero__video{ object-fit: cover; }
+  .vhero__fundo{ display:none; }
+  .vhero__video{
+    left:0; transform:none;
+    width:100%; height:100%;
+    object-fit: cover;
+  }
 }
 .vhero__overlay{
   position:absolute; inset:0;
