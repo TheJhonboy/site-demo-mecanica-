@@ -738,6 +738,34 @@ function setupImageFallback() {
 // por muito mais tempo do que os 8s previstos.
 setupLoader((videoUrl) => setupHeroVideo(videoUrl));
 
+/* =========================================================
+   Onda do clique no botão de fechamento
+   ---------------------------------------------------------
+   A onda nasce no ponto exato onde o dedo encostou, cresce e some. É criada e
+   removida a cada clique em vez de ficar no DOM: um elemento a menos parado na
+   página, e nunca sobra estado de um clique anterior. Quem pediu menos
+   movimento no sistema não recebe nada disso.
+   ========================================================= */
+function setupBotaoOnda() {
+  const botoes = document.querySelectorAll(".btn--pulse");
+  if (!botoes.length) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  botoes.forEach((btn) => {
+    btn.addEventListener("pointerdown", (e) => {
+      const r = btn.getBoundingClientRect();
+      const d = Math.max(r.width, r.height) * 2;
+      const onda = document.createElement("span");
+      onda.className = "btn__onda";
+      onda.style.width = onda.style.height = d + "px";
+      onda.style.left = e.clientX - r.left - d / 2 + "px";
+      onda.style.top = e.clientY - r.top - d / 2 + "px";
+      btn.appendChild(onda);
+      onda.addEventListener("animationend", () => onda.remove(), { once: true });
+    });
+  });
+}
+
 const boot = () => {
   wireWhatsAppLinks();
   wireInstagramLinks();
@@ -748,6 +776,7 @@ const boot = () => {
   setupCountUp();
   setupScrollShow();
   setupPopularTimes();
+  setupBotaoOnda();
   setupImageFallback();
 
   const yearEl = document.getElementById("year");

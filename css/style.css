@@ -189,6 +189,42 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
 }
 .btn--whatsapp:hover{ background: var(--whatsapp-dark); }
 
+/* Botão de fechamento: é o objetivo do site, então ele se anuncia sozinho.
+   O pulso é feito com box-shadow, que não é cortado pelo overflow do próprio
+   botão — assim o anel cresce para fora enquanto a onda do clique fica presa
+   dentro da pílula. Só transform, opacity e sombra: nada que obrigue o
+   navegador a recalcular a página a cada quadro. */
+.btn--pulse{ position:relative; overflow:hidden; animation: btnPulso 2.4s ease-out infinite; }
+@keyframes btnPulso{
+  0%   { box-shadow: 0 8px 20px rgba(37,211,102,.35), 0 0 0 0   rgba(37,211,102,.55); }
+  70%  { box-shadow: 0 8px 20px rgba(37,211,102,.35), 0 0 0 18px rgba(37,211,102,0); }
+  100% { box-shadow: 0 8px 20px rgba(37,211,102,.35), 0 0 0 0   rgba(37,211,102,0); }
+}
+.btn--pulse:hover{
+  transform: translateY(-2px) scale(1.03);
+  animation-play-state: paused;
+  box-shadow: 0 14px 34px rgba(37,211,102,.5);
+}
+.btn--pulse .icon{ transition: transform .28s cubic-bezier(.34,1.56,.64,1); }
+.btn--pulse:hover .icon{ transform: rotate(-10deg) scale(1.12); }
+/* Apertar dá retorno imediato: o botão cede um pouco sob o dedo. */
+.btn--pulse:active{ transform: translateY(0) scale(.97); transition-duration: .06s; }
+
+.btn__onda{
+  position:absolute; border-radius:50%;
+  background: rgba(255,255,255,.45);
+  transform: scale(0);
+  pointer-events:none;
+  animation: btnOnda .55s ease-out forwards;
+}
+@keyframes btnOnda{ to{ transform: scale(1); opacity:0; } }
+
+@media (prefers-reduced-motion: reduce){
+  .btn--pulse{ animation:none; }
+  .btn--pulse:hover{ transform:none; }
+  .btn__onda{ display:none; }
+}
+
 .btn--outline{
   background: transparent;
   border-color: rgba(255,255,255,.35);
@@ -724,19 +760,48 @@ body.is-loading .topbar, body.is-loading .header{ visibility:hidden; }
 .brands{ padding: 88px 0; background: var(--light-bg); }
 .brands__grid{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px,1fr));
+  /* Largura suficiente para a lista de modelos caber numa linha só depois
+     que a marca colorida entrou na frente do texto. */
+  grid-template-columns: repeat(auto-fit, minmax(218px,1fr));
   gap:16px;
 }
 .brand-chip{
+  display:flex; align-items:center; gap:14px;
   background: var(--light-surface);
   border:1px solid var(--light-border);
   border-radius: var(--radius-sm);
-  padding:16px 18px;
-  transition: border-color .2s ease, transform .2s ease;
+  padding:14px 16px;
+  transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
 }
 .brand-chip:hover{ border-color: var(--primary); transform: translateY(-2px); }
+/* Marca visual de cada fabricante: a inicial na cor da montadora. Não é o
+   logotipo — logotipo é marca registrada e não pode ser copiado assim. Serve
+   para o cliente varrer a lista com o olho em vez de ler nove nomes iguais. */
+.brand-chip__marca{
+  flex:0 0 auto;
+  width:42px; height:42px;
+  display:grid; place-items:center;
+  border-radius:50%;
+  font-family:'Poppins',sans-serif;
+  font-weight:800; font-size:1.15rem; line-height:1;
+  color:#fff;
+  background: var(--marca, #4a4f57);
+  transition: transform .2s ease;
+}
+.brand-chip:hover .brand-chip__marca{ transform: scale(1.08); }
+.brand-chip__txt{ min-width:0; }
 .brand-chip strong{ display:block; font-family:'Poppins',sans-serif; margin-bottom:4px; }
-.brand-chip span{ color: var(--dim-ink); font-size:.85rem; }
+.brand-chip__txt > span{ display:block; color: var(--dim-ink); font-size:.85rem; }
+
+.brand-chip--honda{      --marca:#cc0000; }
+.brand-chip--chevrolet{  --marca:#b08333; }
+.brand-chip--volkswagen{ --marca:#001e50; }
+.brand-chip--fiat{       --marca:#a6192e; }
+.brand-chip--hyundai{    --marca:#002c5f; }
+.brand-chip--toyota{     --marca:#d8102a; }
+.brand-chip--renault{    --marca:#c99700; }
+.brand-chip--ford{       --marca:#003478; }
+.brand-chip--nissan{     --marca:#c3002f; }
 .brands__note{ text-align:center; margin-top:28px; color: var(--dim-ink); font-size:.92rem; }
 
 /* ---------- Hours ---------- */

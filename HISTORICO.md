@@ -431,6 +431,46 @@ galeria e gráfico intactos. Imagens do site somam 1,8 MB.
 
 ---
 
+### 27/08/2026 · 18:05 — Mecânico na galeria, botão animado e marcas com cor
+`(este commit)` · *Atende três comentários deixados na prévia*
+
+**1. Foto do mecânico na galeria** — você mandou a foto do carro no elevador e pediu que
+entrasse no segundo quadro da galeria, no lugar da roda que vinha do vídeo. Trocada, com a
+legenda ajustada para "Mecânica Geral — carro no elevador, conferido por baixo item por
+item". É a primeira foto da galeria que mostra a oficina trabalhando, e não um carro parado.
+
+**2. Botão de fechamento animado** — o botão "Chamar no WhatsApp agora" ganhou três camadas
+de movimento: um anel verde que pulsa devagar chamando atenção, um crescimento com brilho
+mais forte quando o mouse chega (com o ícone inclinando junto), e uma **onda que nasce no
+ponto exato do clique** e se espalha pela pílula. O pulso é feito com sombra, que não é
+cortada pela borda arredondada, enquanto a onda fica presa dentro do botão. Tudo em
+`transform`, `opacity` e sombra — nada que obrigue o navegador a recalcular a página. Quem
+configurou o sistema para menos movimento não recebe nenhuma das três.
+
+**3. Marcas com identidade visual** — você pediu os logotipos das montadoras ao lado de cada
+nome. **Não deu para fazer exatamente isso, por dois motivos.** Primeiro, a rede desta
+máquina bloqueia todos os bancos de imagem (testei cinco, nenhum responde), então não tenho
+como baixar arquivo de logo. Segundo, e mais importante: **logotipo de montadora é marca
+registrada**. As fabricantes têm regras próprias sobre uso do logo por terceiros, e num site
+que ainda é demonstração isso é risco desnecessário.
+
+O que foi feito no lugar: cada marca ganhou um **círculo com a inicial, na cor da
+montadora** — Honda em vermelho, Volkswagen em azul-escuro, Renault em amarelo, e assim por
+diante. Não é o logotipo, mas resolve o que você queria: a lista deixou de ser nove nomes
+iguais e passou a ser varrida com o olho. Os cards também ficaram mais largos, para a lista
+de modelos caber numa linha só.
+
+Se você quiser os logotipos de verdade mesmo assim, é decisão sua: manda num zip como fez
+com as fotos e eu coloco no lugar das iniciais.
+
+**Verificado em navegador:** as 8 imagens da galeria continuam distintas, o pulso do botão
+roda sozinho, a onda nasce na posição do clique e é removida do DOM depois (sem sobra), 10
+cards de serviço, nenhuma imagem quebrada, 18 links de WhatsApp, zero erros de JavaScript.
+
+**Arquivos:** `index.html`, `css/style.css`, `js/script.js`, `assets/img/galeria-02.jpg`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços
