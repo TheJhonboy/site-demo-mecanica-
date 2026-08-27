@@ -237,6 +237,49 @@ ambos tocando em loop, revelados em ~165ms.
 
 ---
 
+### 27/08/2026 · 04:58 — Galeria com rolagem ganha imagens de verdade diferentes
+`(este commit)` · *Troca a galeria por 8 cenas distintas do vídeo, em resolução de tela cheia*
+
+**O que foi pedido:** no comentário sobre essa seção você escreveu que ali *"precisa ser
+uma outra imagem scrolável para que funcione de forma dinâmica"*.
+
+**Qual era o problema, de fato:** a galeria reaproveitava as mesmas 10 fotos dos serviços.
+Colocadas lado a lado, não eram 10 cenas — eram **5**: o mesmo farol aparecia duas vezes,
+a mesma roda com pinça vermelha três vezes, o mesmo painel duas vezes. Como quadros
+vizinhos eram praticamente a mesma imagem, rolar não mudava nada na tela. Havia também um
+segundo problema de qualidade: as imagens são 800×600, feitas para os cards de serviço,
+mas a galeria exibe em **tela cheia** — num monitor de 1080p isso significa ampliar 2,4×.
+
+**O que foi feito:**
+
+1. *8 cenas distintas em vez de 10 repetidas* — o vídeo foi mapeado quadro a quadro e tem
+   cerca de 8 assuntos diferentes: farol, roda com pinça, retrovisor, lanterna, tampa
+   traseira, painel, banco e a frente com o farol aceso. Melhor 8 realmente diferentes do
+   que 10 com repetição: agora cada rolada troca a imagem de verdade. A ordem foi montada
+   para que quadros vizinhos contrastem (exterior → interior → detalhe → interior).
+2. *Resolução própria para tela cheia* — arquivos novos em 1440×1080, separados dos
+   serviços, gerados com lanczos e leve realce. Somam 588 KB e carregam sob demanda.
+3. *O contador deixou de mentir* — o "/ 10" estava fixo no HTML e continuaria errado a cada
+   troca de galeria. Agora o total sai da contagem real de imagens.
+4. *Menos marca à mostra* — a última imagem era a tampa traseira com o logo da montadora em
+   destaque, o que destoa de uma oficina **multimarcas**. Foi trocada pela frente com o
+   farol aceso, que combina melhor com a legenda "Entrega" e não mostra marca.
+
+**Verificado em navegador:** percorrendo a seção, as 8 imagens aparecem (8 de 8 distintas),
+o contador vai de 1/8 a 8/8, os títulos passam na ordem, nenhuma imagem quebrada e nenhum
+erro de JavaScript. Conferido também em tela de celular, onde o corte é mais agressivo:
+os oito assuntos continuam reconhecíveis.
+
+**O que isso ainda não resolve — e é bom você saber:** continua sendo **um único carro**,
+o do seu vídeo, e um carro pronto, não a oficina trabalhando. Não há ferramenta, elevador
+nem mecânico em nenhuma imagem. E, como a fonte é 720p na vertical, tela cheia no
+computador é inevitavelmente um pouco mole. As duas coisas só se resolvem com fotos reais
+da oficina.
+
+**Arquivos:** `index.html`, `js/script.js`, 8 imagens novas em `assets/img/`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços

@@ -498,6 +498,10 @@ function setupScrollShow() {
 
   const bar = document.getElementById("scrollshowBar");
   const indexEl = document.getElementById("scrollshowIndex");
+  // O total sai da contagem real de imagens: trocar a galeria no HTML não pode
+  // deixar um "/ 10" velho para trás.
+  const totalEl = document.getElementById("scrollshowTotal");
+  if (totalEl) totalEl.textContent = String(frames.length);
   const titleEl = document.getElementById("scrollshowTitle");
   const textEl = document.getElementById("scrollshowText");
   const caption = section.querySelector(".scrollshow__caption");
