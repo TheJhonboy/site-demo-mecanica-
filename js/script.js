@@ -216,15 +216,66 @@ function setupHeroVideo(objectUrl) {
   video.src = objectUrl || pickVideoSource();
   video.addEventListener("timeupdate", syncLines);
 
+  // Enquanto o vídeo não estiver tocando, as frases giram no relógio — assim a
+  // primeira tela nunca fica completamente muda. Quando o vídeo pega, o
+  // relógio sai de cena e quem manda nas frases volta a ser o tempo do vídeo.
+  let rotator = null;
+  const startRotator = () => {
+    if (rotator) return;
+    let i = active;
+    rotator = setInterval(() => {
+      i = (i + 1) % lines.length;
+      show(i);
+    }, 4200);
+  };
+  const stopRotator = () => {
+    if (!rotator) return;
+    clearInterval(rotator);
+    rotator = null;
+  };
+
+  // Uma checagem só, disparada por qualquer mudança de estado do vídeo: se ele
+  // não está de fato correndo (recusado, pausado, engasgado na rede), o relógio
+  // assume; assim que volta a correr, o relógio sai. Amarrar isso a um único
+  // evento não basta — um "playing" solto chega a desligar o relógio mesmo com
+  // o vídeo parado logo em seguida, e a tela congela de vez.
+  const decidirRelogio = () => {
+    if (video.paused || video.readyState < 3) startRotator();
+    else stopRotator();
+  };
+  ["playing", "play", "pause", "waiting", "stalled", "ended", "error"].forEach(
+    (e) => video.addEventListener(e, decidirRelogio)
+  );
+
+  // Safari no modo de baixo consumo, economia de dados e algumas políticas de
+  // energia recusam o autoplay mesmo com o vídeo mudo. Nesse caso o poster fica
+  // parado na tela — que é justamente a impressão de "site travado". A saída é
+  // tentar de novo no primeiro gesto da pessoa: qualquer toque, rolagem ou
+  // tecla libera o play, e é o próprio navegador que exige esse gesto.
+  const GESTOS = ["pointerdown", "touchstart", "keydown", "wheel", "scroll"];
+  let armado = false;
+  const desarmar = () => {
+    if (!armado) return;
+    armado = false;
+    GESTOS.forEach((g) => document.removeEventListener(g, aoGesto));
+  };
+  const aoGesto = () => { desarmar(); play(); };
+  const armar = () => {
+    if (armado) return;
+    armado = true;
+    GESTOS.forEach((g) =>
+      document.addEventListener(g, aoGesto, { once: true, passive: true })
+    );
+  };
+
   const play = () => {
     const r = video.play();
-    // Se o navegador recusar o autoplay (política de energia, aba em segundo
-    // plano), o poster continua na tela e as frases passam a girar no tempo —
-    // a primeira tela nunca fica muda.
-    if (r && r.catch) r.catch(() => {
-      let i = 0;
-      setInterval(() => { i = (i + 1) % lines.length; show(i); }, 4200);
-    });
+    if (r && r.then) {
+      r.then(() => { desarmar(); decidirRelogio(); }).catch(() => {
+        startRotator();
+        armar();
+      });
+    }
   };
   if (video.readyState >= 2) play();
   else video.addEventListener("loadeddata", play, { once: true });
@@ -232,7 +283,7 @@ function setupHeroVideo(objectUrl) {
   // Aba escondida: o navegador já pausa sozinho, mas garantir a volta evita
   // o vídeo ficar congelado quando a pessoa retorna.
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && video.paused) video.play().catch(() => {});
+    if (!document.hidden && video.paused) play();
   });
 }
 

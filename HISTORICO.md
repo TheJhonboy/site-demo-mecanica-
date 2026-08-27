@@ -202,6 +202,41 @@ numa resolução boa e ficar nítido no computador.
 
 ---
 
+### 27/08/2026 · 04:47 — Vídeo destrava no toque quando o navegador recusa o autoplay
+`(este commit)` · *Destrava o vídeo no primeiro gesto e mantém as frases girando*
+
+**Por que mexer nisso:** o vídeo de fundo já roda sozinho, mas existe um caso em que
+nenhum site consegue começar tocando: **Safari em modo de baixo consumo**, economia de
+dados e algumas políticas de energia recusam o autoplay mesmo com o vídeo mudo. Nesse
+cenário a pessoa cai numa tela parada no poster — exatamente a impressão de "site travado"
+que você vinha relatando.
+
+**O que foi feito:**
+
+1. *Destrava no primeiro gesto* — se o navegador recusa o autoplay, o site passa a esperar
+   o primeiro toque, rolagem ou tecla e tenta tocar de novo ali. É o próprio navegador que
+   exige esse gesto, então é o único caminho que funciona.
+2. *A tela nunca fica muda* — enquanto o vídeo não estiver correndo (recusado, pausado ou
+   engasgado na rede), as frases passam a girar no relógio. Quando o vídeo pega, o relógio
+   sai e quem manda nas frases volta a ser o tempo do vídeo.
+
+**Um erro meu, encontrado no teste:** a primeira versão amarrava o desligamento do relógio
+a um único evento `playing`. Ao simular a recusa de verdade num navegador, um `playing`
+solto chegava antes da hora e matava o relógio — resultado: vídeo parado **e** frases
+paradas, pior que antes. A decisão passou a ser uma checagem do estado real do vídeo,
+disparada por qualquer mudança (`play`, `pause`, `waiting`, `stalled`, `ended`, `error`).
+
+**Como foi verificado:** navegador de verdade com o autoplay bloqueado na marra (o atributo
+`autoplay` do HTML não passa por `play()`, então foi preciso interceptar os dois). Resultado:
+vídeo parado no início, frases girando mesmo assim (0 → 0.3), toque na tela liberou o vídeo,
+e a partir daí as frases voltaram a seguir o tempo do vídeo. Zero erros de JavaScript.
+No caminho normal nada mudou: desktop encaixado pela altura, celular preenchendo a tela,
+ambos tocando em loop, revelados em ~165ms.
+
+**Arquivos:** `js/script.js`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços
