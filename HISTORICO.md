@@ -280,6 +280,48 @@ da oficina.
 
 ---
 
+### 27/08/2026 · 16:29 — Cards de serviço deixam de repetir a mesma foto
+`(este commit)` · *Refaz os 10 recortes dos serviços e tira a marca da montadora de cena*
+
+**O que foi pedido:** no comentário sobre os serviços você escreveu que ali *"precisa de
+outras imagens para ficar mais diversificado"*.
+
+**Qual era o problema, de fato:** o mesmo defeito da galeria, e bem visível na grade. As 10
+fotos eram 6 cenas: **Motor e Sistema Elétrico usavam o mesmo farol**, um logo abaixo do
+outro na grade de 4 colunas; **Pneus, Freios e Suspensão usavam a mesma roda**; e
+**Ar-Condicionado e Diagnóstico usavam o mesmo painel**. Além disso, o card de Bateria
+mostrava a tampa traseira com o **logo da montadora em destaque** — o que passa a mensagem
+errada num site de oficina multimarcas.
+
+**O que foi feito:**
+
+1. *10 recortes que não se repetem* — em vez de recortes quase idênticos da mesma cena, cada
+   card ganhou um enquadramento próprio, variando o assunto e a aproximação. Freios virou um
+   macro na pinça vermelha; Pneus ficou com a roda inteira e o pneu; Suspensão passou a ser a
+   frente baixa com o para-choque, e não mais o farol. Assim nenhum par de cards lê como a
+   mesma foto.
+2. *Marca fora de cena* — o card de Bateria trocou a tampa traseira pelo retrovisor. Não
+   sobrou logo de montadora em nenhum card.
+3. *Textos alternativos honestos* — os `alt` descreviam coisas que não estão nas imagens
+   ("mecânico realizando manutenção em motor"). Não há mecânico nem motor em nenhuma foto.
+   Agora descrevem o que a foto realmente mostra — isso vale para quem usa leitor de tela e
+   para busca.
+4. *Instagram sem repetir os cards* — os seis quadradinhos da seção do Instagram usavam as
+   mesmas fotos dos serviços. Passaram a usar as da galeria, que não aparecem nos cards.
+
+**Verificado em navegador:** 10 cards, 8 imagens na galeria, nenhuma imagem quebrada, 18
+links de WhatsApp, gráfico de movimento intacto, vídeo tocando no desktop e no celular, e o
+destravamento por toque continua funcionando com o autoplay bloqueado. Zero erros de
+JavaScript. Todas as imagens do site somam 1,1 MB e carregam sob demanda.
+
+**A ressalva continua a mesma:** é um carro só, o do seu vídeo, e um carro pronto. Não há
+ferramenta, elevador nem mecânico em nenhuma imagem. Os recortes agora são variados, mas
+variedade de enquadramento não substitui foto de serviço de verdade.
+
+**Arquivos:** `index.html`, 10 imagens em `assets/img/`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços
