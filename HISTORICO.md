@@ -366,6 +366,49 @@ funcionando com o autoplay bloqueado.
 
 ---
 
+### 27/08/2026 · 17:45 — Suas fotos entram nos serviços
+`(este commit)` · *Troca 9 imagens de serviço pelas fotos reais enviadas por você*
+
+**O que foi pedido:** você mandou as fotos num arquivo `.zip` como anexo, depois de duas
+tentativas que não chegaram como arquivo (foto no chat e pasta do Drive — o Drive é
+bloqueado pela rede desta máquina e as ferramentas dele não estão disponíveis nesta sessão).
+
+**O que foi feito:** as 8 fotos foram identificadas, recortadas em 4:3 para os cards
+(960×720, saindo de originais de 2816×1536 na maioria) e instaladas:
+
+| Card | Foto |
+| --- | --- |
+| Freios | disco ventilado com pinça vermelha e pastilhas |
+| Bateria e Alternador | bateria com cabos de teste e alternador |
+| Pneus e Alinhamento | pneu em roda de liga no box de alinhamento |
+| Revisão Completa | mecânico com o checklist e o capô aberto |
+| Ar-Condicionado | difusores soprando ar gelado |
+| Estofamento e Bancos | banco de couro na bancada, com linha e ferramentas |
+| Diagnóstico e Injeção | scanner ligado ao carro mostrando as leituras |
+| Sistema Elétrico | farol aceso com caixa de fusíveis, chicote e multímetro |
+
+**Motor** ganhou um recorte fechado do vão do motor, tirado da mesma foto do capô aberto —
+enquadramento bem diferente do card de Revisão, que mostra o mecânico e a prancheta.
+
+**A foto do topo** passou a ser a mesma cena do capô aberto, em versão larga. Ela aparece a
+50% de opacidade atrás do texto, então funciona como ambiente de oficina sem competir com a
+foto do card.
+
+Os textos alternativos foram reescritos para descrever cada foto nova.
+
+**O que ainda falta:** **Suspensão** é o único card sem foto real. Não há nada no conjunto
+que sirva, e forçar um recorte de outra foto traria de volta a repetição que acabamos de
+resolver. Por ora ficou o recorte antigo do vídeo, mas com o tom escurecido para não destoar
+das fotos de oficina ao redor. É provisório e some assim que chegar a imagem certa.
+
+**Verificado em navegador:** 10 cards, nenhuma imagem quebrada, 18 links de WhatsApp,
+galeria e gráfico intactos, vídeo tocando no desktop e no celular. As imagens do site somam
+1,8 MB, carregadas sob demanda.
+
+**Arquivos:** `index.html`, 10 imagens em `assets/img/`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços
