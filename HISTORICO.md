@@ -409,6 +409,28 @@ galeria e gráfico intactos, vídeo tocando no desktop e no celular. As imagens 
 
 ---
 
+### 27/08/2026 · 17:52 — Suspensão ganha a foto real: os 10 cards completos
+`(este commit)` · *Fecha o último card sem foto de verdade*
+
+**O que foi feito:** chegou a foto que faltava — amortecedor com mola esportiva amarela
+sobre a bancada, no mesmo tom escuro de oficina das outras oito. Recortada em 4:3 (960×720,
+de um original 2816×1536) e instalada no card de Suspensão.
+
+Com isso caiu o último recorte do vídeo que ainda estava nos serviços. **Os 10 cards são
+fotos de oficina de verdade**, todas na mesma linguagem visual, e nenhuma se repete.
+
+**Uma conferência antes de usar:** o arquivo chegou com a extensão `.crdownload`, que o
+Chrome usa em download interrompido. Antes de instalar, verifiquei se a imagem estava
+inteira: marcadores de início e fim de JPEG no lugar e decodificação completa sem erro.
+Estava íntegra — o nome era só resíduo.
+
+**Verificado em navegador:** 10 cards, nenhuma imagem quebrada, 18 links de WhatsApp,
+galeria e gráfico intactos. Imagens do site somam 1,8 MB.
+
+**Arquivos:** `index.html`, `assets/img/servico-suspensao.jpg`
+
+---
+
 ## O que ainda está pendente
 
 - **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços
