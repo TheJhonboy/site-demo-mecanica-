@@ -9,6 +9,12 @@ Site estático (HTML/CSS/JS puro, sem build) com:
 - Bloco de Instagram e depoimentos;
 - Botão flutuante e vários CTAs de WhatsApp com mensagem pré-preenchida por serviço.
 
+## Para assistentes de IA
+Se você é um agente de IA trabalhando neste repositório, leia
+**[`AGENTS.md`](AGENTS.md)** antes de mexer em qualquer arquivo: ele traz o funcionamento
+das partes não óbvias com o motivo de cada uma, as armadilhas conhecidas e as decisões que
+não devem ser reabertas.
+
 ## Histórico do projeto
 Todas as etapas, com data, hora, o que foi pedido e o que mudou, estão em
 [HISTORICO.md](HISTORICO.md).
@@ -38,44 +44,65 @@ Em `index.html`:
 - Depoimentos, marcas e demais textos são exemplos genéricos — ajuste conforme a oficina real.
 - O JSON-LD (dados estruturados) no `<head>` usa os mesmos dados fictícios — atualize junto.
 
-## Fotos dos serviços — recortadas do próprio vídeo
-As 11 imagens em `assets/img/` são recortes do vídeo em `assets/video/oficina.mp4`
-(mesmo carro, mesma luz), o que dá identidade visual coesa ao site inteiro. Não são
-mais os placeholders com o selo "IMAGEM DEMO".
+## Fotos dos serviços
+Os 10 cards de `#servicos` usam **fotos reais de oficina**, em 4:3, 960×720, em
+`assets/img/servico-*.jpg`. Cada card tem a sua: nenhuma imagem se repete entre dois
+cards, e nenhuma mostra logotipo de montadora.
 
-Duas ressalvas honestas: o vídeo mostra um carro pronto, não a oficina trabalhando.
-Então **Motor** e **Bateria** ficaram com imagem de contexto (frente e traseira do
-carro) em vez de foto do serviço em si — troque essas duas primeiro quando tiver
-fotos reais. Os outros oito casam bem com o serviço: roda com pinça de freio, farol,
-painel, bancos, retrovisor.
+| Arquivo | O que mostra |
+| --- | --- |
+| `servico-motor.jpg` | vão do motor com o capô aberto |
+| `servico-pneus.jpg` | pneu em roda de liga, no box de alinhamento |
+| `servico-revisao.jpg` | mecânico conferindo o checklist |
+| `servico-freios.jpg` | disco ventilado com pinça vermelha e pastilhas |
+| `servico-suspensao.jpg` | amortecedor com mola esportiva na bancada |
+| `servico-eletrica.jpg` | farol aceso, caixa de fusíveis, chicote e multímetro |
+| `servico-bateria.jpg` | bateria com cabos de teste e alternador |
+| `servico-arcondicionado.jpg` | difusores do painel soprando ar gelado |
+| `servico-estofamento.jpg` | banco de couro na bancada de estofamento |
+| `servico-diagnostico.jpg` | scanner ligado ao carro, mostrando as leituras |
 
-Comando usado (ajuste `-ss` para o instante e o offset do `crop` para o enquadramento):
+`hero-oficina.jpg` é o fundo do bloco de abertura, exibido a 50% de opacidade atrás do
+texto — por isso serve uma foto de ambiente, e não um detalhe.
+
+**Para trocar qualquer uma:** sobrescreva o arquivo mantendo o mesmo nome. Nenhuma
+alteração de código é necessária. Recomendado: horizontal, 4:3, 960×720 ou maior.
+
+Se a foto vier em outra proporção, o recorte usado no projeto foi:
 ```
-ffmpeg -ss 4.6 -i assets/video/oficina.mp4 -frames:v 1 \
-  -vf "crop=720:540:0:296,scale=800:600:flags=lanczos,unsharp=5:5:0.3" -q:v 5 \
+ffmpeg -i entrada.jpg -vf "crop=2048:1536:384:0,scale=960:720:flags=lanczos" -q:v 3 \
   assets/img/servico-freios.jpg
 ```
+(`crop=largura:altura:x:y` — ajuste `x`/`y` para enquadrar o assunto.)
 
-Para usar fotos próprias, basta sobrescrever os arquivos mantendo os mesmos nomes:
-
-`hero-oficina.jpg`, `servico-motor.jpg`, `servico-pneus.jpg`, `servico-revisao.jpg`,
-`servico-freios.jpg`, `servico-suspensao.jpg`, `servico-eletrica.jpg`,
-`servico-bateria.jpg`, `servico-arcondicionado.jpg`, `servico-estofamento.jpg`,
-`servico-diagnostico.jpg`
-
-Recomendado: horizontais, proporção 4:3, ~800×600 ou maior. Fotos da própria oficina são
-o ideal. Nenhuma alteração de código é necessária.
+**Ao trocar uma foto, troque também o `alt` correspondente em `index.html`.** O texto
+alternativo precisa descrever o que a imagem realmente mostra: é o que o leitor de tela lê
+e o que a busca indexa.
 
 ## O vídeo da primeira tela
 A primeira coisa que o visitante vê é o vídeo da oficina rodando sozinho em loop, com uma
 frase curta no centro e o botão do WhatsApp. Não depende de rolagem: entra tocando.
 
-### Por que ele não estica no computador
-O material é **vertical, 720×1280**. Numa tela de 1920px de largura, preencher a largura
-toda ampliaria o vídeo quase 3× — fica borrado e esticado. Então no computador ele se
-encaixa pela **altura** (`object-fit: contain`) e as laterais ficam na cor do site. No
-celular, onde a tela também é vertical, ele preenche naturalmente (`object-fit: cover`),
-sem barra e sem distorção. A troca é feita por `@media (orientation: portrait)`.
+### Por que ele não estica nem deixa barra preta
+O material é **vertical, 720×1280**, e a tela do computador é deitada — as proporções são
+quase 3× diferentes. Os dois caminhos óbvios falham: preencher a largura amplia o vídeo 2×
+e corta 70% da altura (fica borrado); encaixar pela altura deixa dois terços da tela em
+preto.
+
+A solução são **dois elementos `<video>`** compartilhando o mesmo arquivo:
+
+- `#vheroFundo` preenche a tela, ampliado e desfocado. As laterais carregam a cor e o
+  movimento da própria cena, em vez de virarem barra.
+- `#vheroVideo` fica nítido no centro, com `width: min(100%, 58vw, 936px)`. O teto de
+  936px é 1,3× o tamanho nativo — o limite antes de aparecer borrão. Em telas até 1100px
+  ele nem chega a ser ampliado.
+
+No celular a tela também é vertical: o da frente preenche sozinho (`object-fit: cover`) e
+o de trás fica escondido **e pausado** — vídeo escondido continuaria decodificando e
+gastando bateria. A troca é feita por `@media (orientation: portrait)`.
+
+O `contrast(.78)` no desfoque não é enfeite: sem ele, as cenas escuras do interior do
+carro fazem as laterais virarem preto puro de novo.
 
 ### Dois formatos
 | arquivo | codec | tamanho | para quem |
@@ -113,6 +140,12 @@ ninguém pode ficar preso na tela de carregamento por causa de um arquivo.
 A seção `#scrollshow` é um scrub controlado pelo scroll: as fotos são as frames e o
 dedo/roda controla a posição, como arrastar a linha do tempo de um vídeo.
 
+São **8 imagens próprias** (`assets/img/galeria-*.jpg`, 1440×1080), separadas das dos
+serviços de propósito: repetir as mesmas fotos fazia a rolagem não mudar nada na tela.
+Cada quadro tem legenda própria (`data-title` e `data-text` no `<img>`), e o total do
+contador sai da contagem real de imagens — trocar a galeria não deixa número velho para
+trás. Hoje 1 das 8 é foto de oficina; as outras 7 ainda são recortes do vídeo.
+
 O que mantém isso em 60fps (medido também com CPU 6x mais lenta, em 390x844 @DPR3):
 - o listener de scroll só grava um número; todo o desenho acontece dentro de um único
   `requestAnimationFrame`;
@@ -137,5 +170,10 @@ A velocidade do scrub é controlada por `--frames` e pela altura de `.scrollshow
 no CSS (hoje ~38vh de rolagem por frame no desktop, 30vh no mobile).
 
 ## Deploy na Vercel
-Site 100% estático — a Vercel detecta e publica sem nenhuma configuração adicional (sem `vercel.json`, sem build step).
+Site 100% estático — a Vercel detecta e publica sem nenhuma configuração adicional (sem
+`vercel.json`, sem build step).
+
+**A branch publicada é a `main`.** Todo push para ela dispara um novo deploy automático.
+O desenvolvimento acontece em `claude/mechanic-shop-website-yte9kx` e é levado para a
+`main` quando fica pronto.
 

@@ -471,19 +471,55 @@ cards de serviço, nenhuma imagem quebrada, 18 links de WhatsApp, zero erros de 
 
 ---
 
+### 27/08/2026 · 18:20 — Repositório preparado para outra IA continuar
+`(este commit)` · *Cria AGENTS.md, atualiza README e as pendências*
+
+**O que foi pedido:** você vai trabalhar noutra plataforma usando o que está no Git, e
+quer tudo registrado de forma direta, para que a IA entenda.
+
+**O que foi feito:**
+
+1. **`AGENTS.md`** — o documento de entrega. É o arquivo que outro assistente lê antes de
+   tocar em qualquer coisa. Traz a stack e como rodar, o mapa dos arquivos, os dados
+   fictícios que precisam ser trocados, **o funcionamento das partes não óbvias com o
+   motivo de cada uma**, as convenções do repositório, o estado atual, as pendências, as
+   armadilhas conhecidas e uma tabela de decisões que não devem ser reabertas sem pedido.
+
+   A parte mais útil é a dos motivos. Várias escolhas do site parecem erradas para quem
+   chega agora — dois elementos de vídeo em vez de um, o pulso do botão feito com sombra,
+   iniciais coloridas no lugar dos logotipos — e já foram feitas de outro jeito antes.
+   Sem o registro do porquê, a próxima IA desfaz e a gente volta ao problema.
+
+2. **`CLAUDE.md`** — aponta para o `AGENTS.md`. São dois nomes que ferramentas diferentes
+   procuram; o conteúdo fica num arquivo só, para não haver duas versões divergindo.
+
+3. **`README.md` atualizado** em quatro pontos que tinham envelhecido: as fotos dos
+   serviços (que deixaram de ser recortes do vídeo), o encaixe do vídeo no computador (que
+   deixou de ser barra lateral), a galeria (que ganhou imagens próprias) e o deploy (que
+   passou a sair da `main`).
+
+4. **Pendências revisadas** — a lista ainda dizia que as fotos não tinham chegado e que a
+   `main` estava vazia. Agora reflete o estado real, com o que já foi resolvido registrado.
+
+**Arquivos:** `AGENTS.md` (novo), `CLAUDE.md` (novo), `README.md`, `HISTORICO.md`
+
+---
+
 ## O que ainda está pendente
 
-- **Fotos suas.** Você disse que enviaria imagens. Duas frentes: as 11 fotos dos serviços
-  (Motor e Bateria são as mais urgentes) e a galeria com rolagem, que hoje usa as mesmas
-  fotos dos serviços — como são todas do mesmo carro, rolar ali quase não muda nada.
-  Quanto mais variadas, mais a rolagem vira movimento de verdade.
-- **Publicação na Vercel.** A rede da máquina onde o assistente roda bloqueia o acesso à
-  Vercel (o gateway responde 403), então a publicação parte do seu navegador:
-  Add New → Project → importar `site-demo-mecanica-` → em **Branch** escolher
-  `claude/mechanic-shop-website-yte9kx` → Deploy. O passo que costuma dar errado é o da
-  branch: por padrão a Vercel pega `main`, que está vazia.
-- **Dados reais.** Número de WhatsApp, Instagram, endereço, telefone e o mapa continuam
-  fictícios. O README explica onde trocar cada um.
+Atualizado em 27/08/2026, 18:20.
+
+1. **Trocar os dados fictícios.** É o que separa o site de um uso real. Número de WhatsApp,
+   Instagram, endereço, telefone, o mapa e os dados estruturados do `<head>`. O `README.md`
+   explica onde fica cada um; o endereço aparece em **três** lugares e precisa ser trocado
+   nos três.
+2. **Fotos para a galeria com rolagem.** Dos 8 quadros, 1 é foto de oficina (o carro no
+   elevador) e 7 ainda são recortes do vídeo, todos do mesmo carro parado. É a parte do
+   site que ficou atrás dos serviços.
+3. **Registrar o endereço da Vercel** no README, quando informado.
+
+Resolvido desde a última revisão: as fotos dos serviços chegaram e estão instaladas (os 10
+cards são fotos reais de oficina), e a publicação na Vercel passou a sair da `main`.
 
 ---
 
