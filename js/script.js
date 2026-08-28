@@ -108,12 +108,24 @@ function setupChromeOnScroll() {
   };
 
   let queued = false;
+  let previousY = window.scrollY;
   const paint = () => {
     queued = false;
     const y = window.scrollY;
     if (bar) bar.style.transform = `scaleX(${Math.min(1, Math.max(0, y / scrollable)).toFixed(4)})`;
     if (header) header.classList.toggle("is-scrolled", y > 10);
+    if (header) {
+      // Esconde a barra apenas depois de uma rolagem intencional para baixo;
+      // qualquer gesto para cima a traz de volta, no mouse e no toque.
+      const mobileMenuOpen = document.getElementById("nav")?.classList.contains("is-open");
+      if (y <= 12 || mobileMenuOpen || y < previousY - 5) {
+        header.classList.remove("is-hidden");
+      } else if (y > previousY + 8 && y > 80) {
+        header.classList.add("is-hidden");
+      }
+    }
     if (btn) btn.classList.toggle("is-visible", y > 500);
+    previousY = y;
   };
   const onScroll = () => {
     if (queued) return;
@@ -197,8 +209,10 @@ function setupHeroVideo(objectUrl) {
   if (deitada.addEventListener) deitada.addEventListener("change", ajustarFundo);
 
   const lines = Array.from(section.querySelectorAll(".vhero__line"));
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let active = 0;
+  // Só decodificamos o vídeo quando a primeira tela está realmente em foco.
+  // Isso evita gastar CPU/bateria enquanto a pessoa explora as outras seções.
+  let heroVisible = false;
 
   const show = (i) => {
     if (i === active) return;
@@ -217,14 +231,6 @@ function setupHeroVideo(objectUrl) {
     }
     show(want);
   };
-
-  if (reduced) {
-    // Sem movimento: os dois ficam no poster, com a primeira frase.
-    video.removeAttribute("autoplay");
-    video.load();
-    if (fundo) { fundo.removeAttribute("autoplay"); fundo.load(); }
-    return;
-  }
 
   video.src = objectUrl || pickVideoSource();
   if (fundo) fundo.src = video.src;
@@ -254,6 +260,10 @@ function setupHeroVideo(objectUrl) {
   // evento não basta — um "playing" solto chega a desligar o relógio mesmo com
   // o vídeo parado logo em seguida, e a tela congela de vez.
   const decidirRelogio = () => {
+    if (!heroVisible || document.hidden) {
+      stopRotator();
+      return;
+    }
     if (video.paused || video.readyState < 3) startRotator();
     else stopRotator();
   };
@@ -297,6 +307,7 @@ function setupHeroVideo(objectUrl) {
   };
 
   const play = () => {
+    if (!heroVisible || document.hidden) return;
     const r = video.play();
     if (r && r.then) {
       r.then(() => { desarmar(); decidirRelogio(); }).catch(() => {
@@ -305,32 +316,51 @@ function setupHeroVideo(objectUrl) {
       });
     }
   };
+
+  // Ao sair da primeira tela, pausa também o decodificador. Ao voltar, o vídeo
+  // retoma no mesmo ponto e segue em loop, sem áudio.
+  const visibilityObserver = new IntersectionObserver((entries) => {
+    const entry = entries[0];
+    heroVisible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+    if (heroVisible) {
+      play();
+    } else {
+      video.pause();
+      if (fundo) fundo.pause();
+      stopRotator();
+    }
+  }, { threshold: [0, 0.55] });
+  visibilityObserver.observe(section);
+
   if (video.readyState >= 2) play();
   else video.addEventListener("loadeddata", play, { once: true });
 
   // Aba escondida: o navegador já pausa sozinho, mas garantir a volta evita
   // o vídeo ficar congelado quando a pessoa retorna.
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && video.paused) play();
+    if (document.hidden) {
+      video.pause();
+      if (fundo) fundo.pause();
+      stopRotator();
+    } else if (heroVisible && video.paused) {
+      play();
+    }
   });
 }
 
 /* =========================================================
-   Loader — progresso real do download do vídeo
+   Loader — pré-carga completa da primeira visita
    ---------------------------------------------------------
-   A barra reflete quantos bytes do vídeo já chegaram, não um timer falso: o
-   arquivo é baixado com fetch em pedaços e vira um blob que o <video> consome
-   já pronto — assim a primeira tela nunca começa engasgando. Se o navegador
-   não tiver streaming, ou algo falhar, o vídeo carrega do jeito normal.
-   Um prazo de 8s revela o site de qualquer forma: ninguém pode ficar preso na
-   tela de carregamento por causa de um arquivo.
+   A tela de carregamento é o primeiro elemento visível. Antes de liberá-la,
+   decodificamos todas as imagens do HTML e baixamos os dois vídeos locais.
+   Assim os cards e o vídeo principal já entram prontos, sem congelar enquanto
+   a pessoa rola. Arquivo que falhar não bloqueia a visita: ele é tratado pela
+   rotina de fallback de imagens depois que a tela abre.
    ========================================================= */
-// MP4/H.264 primeiro: é decodificado em hardware em praticamente todo aparelho,
-// o que pesa menos na bateria do celular. O WebM/VP9 cobre os navegadores sem
-// H.264 (algumas builds de Chromium e Firefox no Linux) e é menor.
+// Vídeo fornecido para a primeira tela. Mantemos o MP4, que é decodificado em
+// hardware na grande maioria dos navegadores e dá o melhor desempenho no loop.
 const VHERO_SOURCES = [
-  { src: "assets/video/oficina.mp4", type: 'video/mp4; codecs="avc1.42E01E"' },
-  { src: "assets/video/oficina.webm", type: 'video/webm; codecs="vp9"' },
+  { src: "assets/video/ferrari-loop.mp4", type: 'video/mp4' },
 ];
 
 function pickVideoSource() {
@@ -350,7 +380,7 @@ function setupLoader(onReady) {
   const paint = (ratio) => {
     const r = Math.max(0, Math.min(1, ratio));
     if (bar) bar.style.transform = `scaleX(${r.toFixed(4)})`;
-    if (pct) pct.textContent = `${Math.round(r * 100)}%`;
+    if (pct) pct.textContent = `Preparando ${Math.round(r * 100)}%`;
   };
 
   const reveal = (objectUrl) => {
@@ -365,38 +395,51 @@ function setupLoader(onReady) {
     onReady(objectUrl);
   };
 
-  paint(0);
-  setTimeout(() => reveal(null), 8000);
+  const unique = (items) => [...new Set(items.filter(Boolean))];
+  const imageUrls = unique([...document.images].map((img) => img.currentSrc || img.src));
+  const heroUrl = pickVideoSource();
+  const videoUrls = unique([heroUrl, "assets/video/bmw-logo-loop.mp4", "assets/video/final-cta-loop.mp4"]);
+  const tasks = [
+    ...imageUrls.map((url) => ({ kind: "image", url })),
+    ...videoUrls.map((url) => ({ kind: "video", url })),
+  ];
+  let finished = 0;
+  let heroObjectUrl = null;
+  const progress = () => paint(tasks.length ? finished / tasks.length : 1);
+  const complete = () => { finished += 1; progress(); };
 
-  const download = async () => {
-    if (!window.fetch || !window.ReadableStream) return reveal(null);
+  const preloadImage = (url) => new Promise((done) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => {
+      const decoded = typeof img.decode === "function" ? img.decode().catch(() => {}) : Promise.resolve();
+      decoded.finally(done);
+    };
+    img.onerror = done;
+    img.src = url;
+  });
+
+  const preloadVideo = async (url) => {
+    if (!window.fetch) return null;
     try {
-      const res = await fetch(pickVideoSource());
-      if (!res.ok || !res.body) return reveal(null);
-
-      const total = Number(res.headers.get("content-length")) || 0;
-      const reader = res.body.getReader();
-      const chunks = [];
-      let got = 0;
-
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        got += value.length;
-        // Sem content-length (resposta comprimida em stream) a barra avança por
-        // estimativa: melhor um progresso aproximado que uma barra parada.
-        paint(total ? got / total : Math.min(0.95, got / 3.6e6));
-      }
-      if (revealed) return; // o prazo de 8s já revelou; o vídeo entra normal
-      const tipo = res.headers.get("content-type") || "video/mp4";
-      reveal(URL.createObjectURL(new Blob(chunks, { type: tipo })));
-    } catch (e) {
-      reveal(null);
+      const response = await fetch(url, { cache: "force-cache" });
+      if (!response.ok) return null;
+      const blob = await response.blob();
+      return url === heroUrl ? URL.createObjectURL(blob) : null;
+    } catch (_) {
+      return null;
     }
   };
 
-  download();
+  paint(0);
+  Promise.all(tasks.map(async (task) => {
+    if (task.kind === "image") await preloadImage(task.url);
+    else {
+      const objectUrl = await preloadVideo(task.url);
+      if (objectUrl) heroObjectUrl = objectUrl;
+    }
+    complete();
+  })).then(() => reveal(heroObjectUrl));
 }
 
 /* =========================================================
@@ -731,40 +774,31 @@ function setupImageFallback() {
   });
 }
 
+// O vídeo da chamada final só decodifica quando a seção está próxima da tela.
+// Ao sair dela, pausamos o loop para não gastar bateria nem GPU no celular.
+function setupFinalCtaVideo() {
+  const section = document.querySelector(".final-cta");
+  const video = section?.querySelector(".final-cta__video");
+  if (!section || !video) return;
+
+  const play = () => video.play().catch(() => {});
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !document.hidden) play();
+    else video.pause();
+  }, { rootMargin: "180px 0px" });
+  observer.observe(section);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) video.pause();
+    else if (section.getBoundingClientRect().top < window.innerHeight + 180 && section.getBoundingClientRect().bottom > -180) play();
+  });
+}
+
 // O loader arranca já, sem esperar DOMContentLoaded: este script está no fim
 // do body, então os elementos existem, e qualquer recurso externo lento (a
 // fonte, por exemplo) atrasaria o início do download dos quadros — e junto o
 // timeout de segurança, deixando o visitante olhando a tela de carregamento
 // por muito mais tempo do que os 8s previstos.
 setupLoader((videoUrl) => setupHeroVideo(videoUrl));
-
-/* =========================================================
-   Onda do clique no botão de fechamento
-   ---------------------------------------------------------
-   A onda nasce no ponto exato onde o dedo encostou, cresce e some. É criada e
-   removida a cada clique em vez de ficar no DOM: um elemento a menos parado na
-   página, e nunca sobra estado de um clique anterior. Quem pediu menos
-   movimento no sistema não recebe nada disso.
-   ========================================================= */
-function setupBotaoOnda() {
-  const botoes = document.querySelectorAll(".btn--pulse");
-  if (!botoes.length) return;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-  botoes.forEach((btn) => {
-    btn.addEventListener("pointerdown", (e) => {
-      const r = btn.getBoundingClientRect();
-      const d = Math.max(r.width, r.height) * 2;
-      const onda = document.createElement("span");
-      onda.className = "btn__onda";
-      onda.style.width = onda.style.height = d + "px";
-      onda.style.left = e.clientX - r.left - d / 2 + "px";
-      onda.style.top = e.clientY - r.top - d / 2 + "px";
-      btn.appendChild(onda);
-      onda.addEventListener("animationend", () => onda.remove(), { once: true });
-    });
-  });
-}
 
 const boot = () => {
   wireWhatsAppLinks();
@@ -776,8 +810,8 @@ const boot = () => {
   setupCountUp();
   setupScrollShow();
   setupPopularTimes();
-  setupBotaoOnda();
   setupImageFallback();
+  setupFinalCtaVideo();
 
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
