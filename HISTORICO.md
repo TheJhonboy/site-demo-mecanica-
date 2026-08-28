@@ -14,6 +14,29 @@ por isso a hora aqui aparece 3h antes da que o GitHub mostra por padrão.
 
 ## Linha do tempo
 
+### 28/08/2026 · 01:00 — Atualização visual completa e mídias do site
+
+**O que foi pedido:** consolidar as alterações visuais aprovadas no site: vídeos em loop,
+imagens específicas para cada serviço, logotipos das marcas, uma tela de carregamento,
+CTAs de WhatsApp mais chamativos, barra de navegação que acompanha a rolagem e os botões
+flutuantes alinhados.
+
+**O que foi feito:** o vídeo principal foi substituído por um loop sem áudio, carregado antes
+da exibição do site e pausado fora da área visível. Foram incluídos um loop discreto ao lado
+da marca e outro no CTA final; o carregador agora apresenta o carro, o nome Klaus e uma barra
+de progresso. Cada serviço ganhou foto própria, a galeria recebeu foto de mecânico trabalhando,
+as marcas exibem suas identidades visuais e os CTAs de WhatsApp passaram a ter movimento em
+loop. A navegação do topo se esconde ao descer a página e reaparece ao subir, inclusive no
+celular. Os atalhos flutuantes de WhatsApp e de retorno ao topo foram reposicionados em uma
+coluna alinhada.
+
+**Arquivos:** `index.html`, `css/style.css`, `js/script.js`, `assets/img/servico-*-real.png`,
+`assets/img/galeria-mecanico-volkswagen.png`, `assets/img/hero-oficina-wide.png`,
+`assets/video/bmw-logo-loop.mp4`, `assets/video/ferrari-loop.mp4`,
+`assets/video/final-cta-loop.mp4`, `HISTORICO.md`
+
+---
+
 ### 23/08/2026 · 00:37 — Repositório criado
 `b6cb86e` · *Initial commit*
 

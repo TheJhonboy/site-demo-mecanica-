@@ -21,7 +21,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"></noscript>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=20260828-floating-actions-aligned">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -51,9 +51,14 @@
 <!-- ===== TELA DE CARREGAMENTO ===== -->
 <div class="loader" id="loader" role="status" aria-live="polite" aria-label="Carregando o site">
   <div class="loader__inner">
-    <span class="loader__logo">Klaus<span>.</span></span>
+    <div class="loader__brand" aria-label="Klaus Auto Mecânica">
+      <video class="loader__car" muted loop autoplay playsinline preload="auto" aria-hidden="true" tabindex="-1">
+        <source src="assets/video/bmw-logo-loop.mp4" type="video/mp4">
+      </video>
+      <span class="loader__logo">Klaus<span>.</span></span>
+    </div>
     <div class="loader__bar"><span id="loaderBar"></span></div>
-    <span class="loader__pct" id="loaderPct">0%</span>
+    <span class="loader__pct" id="loaderPct">Preparando 0%</span>
   </div>
 </div>
 
@@ -80,7 +85,12 @@
 <!-- ===== HEADER ===== -->
 <header class="header" id="header">
   <div class="container header__inner">
-    <a href="#top" class="logo">Klaus<span>.</span></a>
+    <div class="brand-lockup">
+      <a href="#top" class="logo">Klaus<span>.</span></a>
+      <video class="brand-lockup__car" muted loop autoplay playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+        <source src="assets/video/bmw-logo-loop.mp4" type="video/mp4">
+      </video>
+    </div>
 
     <nav class="nav" id="nav">
       <a href="#servicos" class="nav__link">Serviços</a>
@@ -199,7 +209,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-motor.jpg" alt="Mecânico trabalhando no vão do motor com o capô aberto" loading="lazy">
+            <img src="assets/img/servico-motor-real.png" alt="Mecânico inspecionando o motor de um carro na oficina" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
                 <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
@@ -220,7 +230,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-pneus.jpg" alt="Pneu montado em roda de liga leve com manômetro no box de alinhamento" loading="lazy">
+            <img src="assets/img/servico-pneus-real.png" alt="Mecânico realizando alinhamento em roda e pneu" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="9" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="15" x2="12" y2="21" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1.8"/><line x1="15" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>
             </div>
@@ -234,7 +244,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-revisao.jpg" alt="Mecânico conferindo o checklist da revisão com o capô aberto" loading="lazy">
+            <img src="assets/img/servico-revisao-real.png" alt="Mecânico fazendo revisão completa com checklist digital" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="2" width="6" height="3" rx="1" fill="currentColor"/><polyline points="8,13 11,16 16,9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
@@ -248,7 +258,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-freios.jpg" alt="Disco de freio ventilado com pinça vermelha e pastilhas na bancada da oficina" loading="lazy">
+            <img src="assets/img/servico-freios-real.png" alt="Mecânico fazendo manutenção em disco e pastilhas de freio" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="currentColor"/>
                 <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="6.5"/><line x1="12" y1="17.5" x2="12" y2="20"/><line x1="4" y1="12" x2="6.5" y2="12"/><line x1="17.5" y1="12" x2="20" y2="12"/><line x1="6.3" y1="6.3" x2="8" y2="8"/><line x1="16" y1="16" x2="17.7" y2="17.7"/></g>
@@ -264,7 +274,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-suspensao.jpg" alt="Amortecedor com mola esportiva amarela sobre a bancada da oficina" loading="lazy">
+            <img src="assets/img/servico-suspensao-real.png" alt="Mecânico trabalhando na suspensão de um carro elevado" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><polyline points="6,3 10,6 6,9 10,12 6,15 10,18 6,21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="3" x2="16" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             </div>
@@ -278,7 +288,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-eletrica.jpg" alt="Farol aceso ao lado da caixa de fusíveis, chicote elétrico e multímetro" loading="lazy">
+            <img src="assets/img/servico-eletrica-real.png" alt="Técnico verificando chicote e componentes elétricos do carro" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><polygon points="13,2 6,14 11,14 9,22 18,10 12,10" fill="currentColor"/></svg>
             </div>
@@ -292,7 +302,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-bateria.jpg" alt="Bateria automotiva com cabos de teste e alternador sobre a bancada" loading="lazy">
+            <img src="assets/img/servico-bateria-real.png" alt="Mecânico testando a bateria e o alternador no motor" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="5" width="3" height="3" fill="currentColor"/><line x1="8" y1="13.5" x2="16" y2="13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             </div>
@@ -306,7 +316,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-arcondicionado.jpg" alt="Difusores do painel soprando ar gelado durante a recarga do sistema" loading="lazy">
+            <img src="assets/img/servico-arcondicionado-real.png" alt="Técnico revisando o sistema de ar-condicionado automotivo" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="8" x2="15" y2="8"/><line x1="3" y1="12" x2="19" y2="12"/><line x1="3" y1="16" x2="12" y2="16"/></svg>
             </div>
@@ -320,7 +330,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-estofamento.jpg" alt="Banco de couro costurado sobre a bancada de estofamento, com linha e ferramentas" loading="lazy">
+            <img src="assets/img/servico-estofamento-real.png" alt="Profissional cuidando do acabamento do banco do carro" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="12" width="16" height="6" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="4" width="6" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
             </div>
@@ -334,7 +344,7 @@
 
         <div class="service-card">
           <div class="service-card__media">
-            <img src="assets/img/servico-diagnostico.jpg" alt="Scanner automotivo ligado ao carro mostrando as leituras da injeção" loading="lazy">
+            <img src="assets/img/servico-diagnostico-real.png" alt="Mecânico utilizando scanner no diagnóstico eletrônico do carro" loading="lazy">
             <div class="service-card__icon">
               <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><polyline points="6,13 9,8 12,12 15,7 18,10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="20" x2="15" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="16" x2="12" y2="20" stroke="currentColor" stroke-width="1.8"/></svg>
             </div>
@@ -355,8 +365,8 @@
     <div class="scrollshow__track">
       <div class="scrollshow__pin">
         <div class="scrollshow__frames">
-          <img class="scrollshow__img" src="assets/img/galeria-01.jpg" alt="Farol dianteiro revisado" data-title="Faróis e Lanternas" data-text="Lâmpadas, facho alinhado e lente restaurada." loading="lazy">
-          <img class="scrollshow__img" src="assets/img/galeria-02.jpg" alt="Mecânico inspecionando a parte de baixo do carro no elevador" data-title="Mecânica Geral" data-text="Carro no elevador, conferido por baixo item por item." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/galeria-mecanico-volkswagen.png" alt="Mecânico realizando diagnóstico no interior de um Volkswagen" data-title="Diagnóstico Volkswagen" data-text="Scanner e leitura eletrônica feitos dentro do veículo." loading="lazy">
+          <img class="scrollshow__img" src="assets/img/galeria-02.jpg" alt="Roda com pinça de freio" data-title="Freios" data-text="Pastilhas, discos e pinças conferidos um a um." loading="lazy">
           <img class="scrollshow__img" src="assets/img/galeria-03.jpg" alt="Painel e console do veículo" data-title="Diagnóstico" data-text="Scanner na injeção antes de encostar a mão." loading="lazy">
           <img class="scrollshow__img" src="assets/img/galeria-04.jpg" alt="Lanterna traseira do veículo" data-title="Elétrica" data-text="Lanternas, fusíveis e chicotes testados." loading="lazy">
           <img class="scrollshow__img" src="assets/img/galeria-05.jpg" alt="Banco dianteiro do veículo" data-title="Interior" data-text="Higienização e cuidado com os bancos." loading="lazy">
@@ -368,8 +378,8 @@
 
           <div class="scrollshow__caption">
             <span class="scrollshow__count"><span id="scrollshowIndex">1</span> / <span id="scrollshowTotal">8</span></span>
-            <h3 id="scrollshowTitle">Motor e Mecânica Geral</h3>
-            <p id="scrollshowText">Diagnóstico e reparo com peças de qualidade.</p>
+            <h3 id="scrollshowTitle">Diagnóstico Volkswagen</h3>
+            <p id="scrollshowText">Scanner e leitura eletrônica feitos dentro do veículo.</p>
           </div>
 
           <div class="scrollshow__progress"><span id="scrollshowBar"></span></div>
@@ -423,15 +433,15 @@
         <p>Se o seu carro está aqui embaixo (ou não), pode trazer — nossa equipe atende praticamente qualquer modelo.</p>
       </div>
       <div class="brands__grid">
-        <div class="brand-chip brand-chip--honda"><span class="brand-chip__marca" aria-hidden="true">H</span><span class="brand-chip__txt"><strong>Honda</strong><span>Civic · City · Fit · HR-V</span></span></div>
-        <div class="brand-chip brand-chip--chevrolet"><span class="brand-chip__marca" aria-hidden="true">C</span><span class="brand-chip__txt"><strong>Chevrolet</strong><span>Onix · Cruze · Prisma · S10</span></span></div>
-        <div class="brand-chip brand-chip--volkswagen"><span class="brand-chip__marca" aria-hidden="true">V</span><span class="brand-chip__txt"><strong>Volkswagen</strong><span>Gol · Polo · Virtus · T-Cross</span></span></div>
-        <div class="brand-chip brand-chip--fiat"><span class="brand-chip__marca" aria-hidden="true">F</span><span class="brand-chip__txt"><strong>Fiat</strong><span>Argo · Mobi · Toro · Uno</span></span></div>
-        <div class="brand-chip brand-chip--hyundai"><span class="brand-chip__marca" aria-hidden="true">H</span><span class="brand-chip__txt"><strong>Hyundai</strong><span>HB20 · Creta · i30</span></span></div>
-        <div class="brand-chip brand-chip--toyota"><span class="brand-chip__marca" aria-hidden="true">T</span><span class="brand-chip__txt"><strong>Toyota</strong><span>Corolla · Etios · Hilux</span></span></div>
-        <div class="brand-chip brand-chip--renault"><span class="brand-chip__marca" aria-hidden="true">R</span><span class="brand-chip__txt"><strong>Renault</strong><span>Kwid · Sandero · Duster</span></span></div>
-        <div class="brand-chip brand-chip--ford"><span class="brand-chip__marca" aria-hidden="true">F</span><span class="brand-chip__txt"><strong>Ford</strong><span>Ka · EcoSport · Ranger</span></span></div>
-        <div class="brand-chip brand-chip--nissan"><span class="brand-chip__marca" aria-hidden="true">N</span><span class="brand-chip__txt"><strong>Nissan</strong><span>Kicks · Versa · March</span></span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/honda" alt="Honda"><span>Civic · City · Fit · HR-V</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/chevrolet" alt="Chevrolet"><span>Onix · Cruze · Prisma · S10</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/volkswagen" alt="Volkswagen"><span>Gol · Polo · Virtus · T-Cross</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/fiat" alt="Fiat"><span>Argo · Mobi · Toro · Uno</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/hyundai" alt="Hyundai"><span>HB20 · Creta · i30</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/toyota" alt="Toyota"><span>Corolla · Etios · Hilux</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/renault" alt="Renault"><span>Kwid · Sandero · Duster</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/ford" alt="Ford"><span>Ka · EcoSport · Ranger</span></div>
+        <div class="brand-chip"><img class="brand-chip__logo" src="https://cdn.simpleicons.org/nissan" alt="Nissan"><span>Kicks · Versa · March</span></div>
       </div>
       <p class="brands__note">…e outras marcas nacionais e importadas. Na dúvida, chame no WhatsApp.</p>
     </div>
@@ -612,10 +622,13 @@
 
   <!-- ===== CTA FINAL ===== -->
   <section class="final-cta">
+    <video class="final-cta__video" muted loop autoplay playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+      <source src="assets/video/final-cta-loop.mp4" type="video/mp4">
+    </video>
     <div class="container final-cta__inner">
       <h2>Seu carro precisa de atenção agora?</h2>
       <p>Fale com a nossa equipe e receba um orçamento sem compromisso, direto no seu WhatsApp.</p>
-      <a href="#" class="btn btn--whatsapp btn--lg btn--pulse" data-wa data-msg="Olá! Vim pelo site da oficina Klaus e quero falar com a oficina.">
+      <a href="#" class="btn btn--whatsapp btn--lg" data-wa data-msg="Olá! Vim pelo site da oficina Klaus e quero falar com a oficina.">
         <svg class="icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="5" stroke="currentColor" stroke-width="1.8"/><polygon points="6,18 6,22 10,18" fill="currentColor"/><circle cx="9" cy="11.5" r="1.3" fill="currentColor"/><circle cx="12" cy="11.5" r="1.3" fill="currentColor"/><circle cx="15" cy="11.5" r="1.3" fill="currentColor"/></svg>
         Chamar no WhatsApp agora
       </a>
@@ -682,6 +695,6 @@
 
 <button class="back-to-top" id="backToTop" aria-label="Voltar ao topo">↑</button>
 
-<script src="js/script.js"></script>
+<script src="js/script.js?v=20260828-final-video"></script>
 </body>
 </html>
